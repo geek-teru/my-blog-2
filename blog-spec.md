@@ -202,7 +202,10 @@ heroImage: ./images/xxx.png    # 任意
 - [x] **Astro の glob loader の `base` をプロジェクトルート直下 `content/` にできるか**（`src/` 外）
       → **できる**（2026-08-31 / Astro 7.2.9 で確認）。`glob({ base: './content/blog' })` で
       `astro dev` / `astro build` の両方が通り、記事ページ・一覧・RSS・sitemap すべて生成された
-- [ ] **content リポジトリ内の相対画像に Astro の画像最適化が効くか**
+- [x] **content リポジトリ内の相対画像に Astro の画像最適化が効くか**
+      → **効く**（2026-08-31 / Astro 7.2.9 で確認）。`src/` の外にある `content/blog/images/` を
+      本文と `heroImage` の両方から相対パスで参照して、dev では `/_image` 経由の webp、
+      build では `/_astro/*.webp` への変換（32kB → 16kB）が確認できた
 - [ ] **Vercel での git submodule ビルド** — private リポジトリだと権限で詰まる可能性。public なら素直に通る
 - [ ] **各サービスの無料枠の現行値**（R2 10GB / Vercel Hobby 100GB 帯域 / Cloudflare Pages 等）— 変動するので採用前に確認
 

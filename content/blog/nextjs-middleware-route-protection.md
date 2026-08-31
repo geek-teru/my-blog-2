@@ -4,6 +4,7 @@ description: "前回、Next.js 16 と Supabase で Google ログインを実装�
 pubDate: 2026-08-31
 tags: ["Next.js", "Supabase", "認証", "Middleware"]
 draft: true
+heroImage: ./images/sample-screenshot.jpg
 ---
 ## はじめに
 
@@ -18,6 +19,8 @@ draft: true
 Supabase のセットアップ、`@supabase/ssr`、Cookie の扱いは前回の記事で書いたので、そちらを前提に進めます。
 
 ## ルート保護とは
+
+![Phase 4 の画像検証用のサンプル画像](./images/sample-screenshot.jpg)
 
 ログインしていない人に、そのページを見せないようにする仕組みです。「ルート」は route（URL のパス）で、root ではありません。
 
