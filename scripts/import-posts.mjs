@@ -41,15 +41,30 @@ const yamlString = (s) => JSON.stringify(s);
 /**
  * タイトルは「最初の H1、無ければ最初の非空行」から拾い、その行は本文から取り除く。
  * レイアウト側が h1 を出すため、残すとタイトルが二重に表示される。
+ *
+ * コードフェンスの中は必ず読み飛ばす。シェルや TOML のコメント行（`# ...`）は
+ * 見出しと見分けがつかず、拾ってしまうとタイトルにも本文にも被害が出るため。
  */
 function extractTitle(lines) {
-	const h1 = lines.findIndex((l) => /^#\s+\S/.test(l));
-	if (h1 !== -1) {
-		return { title: lines[h1].replace(/^#\s+/, '').trim(), index: h1 };
+	let inFence = false;
+	let firstText = -1;
+
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		if (/^\s*(```|~~~)/.test(line)) {
+			inFence = !inFence;
+			continue;
+		}
+		if (inFence) continue;
+
+		if (/^#\s+\S/.test(line)) {
+			return { title: line.replace(/^#\s+/, '').trim(), index: i };
+		}
+		if (firstText === -1 && line.trim() !== '') firstText = i;
 	}
-	const first = lines.findIndex((l) => l.trim() !== '');
-	if (first === -1) return { title: null, index: -1 };
-	return { title: lines[first].trim(), index: first };
+
+	if (firstText === -1) return { title: null, index: -1 };
+	return { title: lines[firstText].trim(), index: firstText };
 }
 
 /** 最初の「普通の段落」から 100 字程度の説明文を作る。見出し・引用・箇条書き・コードは飛ばす */

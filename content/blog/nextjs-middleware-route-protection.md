@@ -3,7 +3,7 @@ title: "Next.js 16 の Middleware でルート保護を実装してみた"
 description: "前回、Next.js 16 と Supabase で Google ログインを実装しました（前回の記事）。"
 pubDate: 2026-08-31
 tags: []
-draft: false
+draft: true
 ---
 ## はじめに
 

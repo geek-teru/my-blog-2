@@ -37,14 +37,16 @@
 - [ ] **記事本文に下書きメモが残っている**
       `content/blog/nextjs-middleware-route-protection.md` の「はじめに」直下に
       `> ここは下書きです。動機まわりはご自身の言葉に差し替えてください。` がある。
-      公開するとそのまま読者に見える。→ 出どころ: Phase 2
-- [ ] **`/blog/nextjs-supabase-google-oauth-local/` へのリンクが 404 になる**
-      本文の「前回の記事」リンクを plan どおり `/blog/<slug>/` に張り替えたが、
-      リンク先の記事は取り込み対象外のため存在しない。
-      対応案: (a) その1本も取り込む (b) リンクを外して素のテキストにする。→ 出どころ: Phase 2
-- [ ] **Header / Footer のソーシャルリンクが Astro 公式アカウントのまま**
-      Mastodon / Twitter / GitHub の3つ。本人のアカウントに差し替えるか、消すか。
-      → 出どころ: Phase 1（雛形の初期値）
+      → **2026-08-31: 記事を `draft: true` にして本番ビルドから隠した。**
+      漏れる心配は消えたが、メモ自体は残っている。動機の段落を自分の言葉で書き、
+      メモを消し、`draft: false` に戻すところまでが完了。これは体裁ではなく執筆作業。
+      → 出どころ: Phase 2
+- [x] ~~**`/blog/nextjs-supabase-google-oauth-local/` へのリンクが 404 になる**~~
+      → **2026-08-31 対応済み。** `2026-08-30-nextjs-supabase-google-oauth-local.md` を
+      追加で取り込み、リンク先を実在させた（案 (a)）。dev で 200 を確認。→ 出どころ: Phase 2
+- [x] ~~**Header / Footer のソーシャルリンクが Astro 公式アカウントのまま**~~
+      → **2026-08-31 対応済み。** Mastodon / Twitter / GitHub の3つとも、markup と CSS ごと削除。
+      本人のアカウントを載せたくなったら足す。→ 出どころ: Phase 1（雛形の初期値）
 
 ### Phase 3（体裁）で扱う
 
@@ -64,6 +66,9 @@
       - 日付フォールバック（ファイル名に `YYYY-MM-DD-` が無いとき mtime を使う）
       - タイトルが H1 でない場合のフォールバック（最初の非空行を使う）
       - frontmatter 済みファイルの素通し
+      ※ 2026-08-31: 2本目の取り込み時に `extractTitle` がコードフェンスを見ておらず、
+        TOML / シェルのコメント行（`# ...`）を見出しと誤認する不具合が見つかり修正した。
+        タイトルが H1 でない残り2本はこの罠を踏みやすいので、取り込み時は結果を目視すること。
       → 出どころ: Phase 2
 - [ ] **git の `user.email` がグローバル設定ではプレースホルダのまま**
       `you@example.com`。このリポジトリだけローカル設定で修正済みだが、
@@ -172,24 +177,28 @@
 - 日付の表示が英語のまま（Phase 3 で扱う）
 - `import-posts.mjs` の3分岐が未検証（残り3本を取り込むときが初回実行）
 
-## Phase 3 — ブログとしての体裁
+## Phase 3 — ブログとしての体裁 🚧 進行中
 
-- [ ] **draft フィルタを実装**（`import.meta.env.PROD` で除外）
-      - [ ] 一覧ページ
-      - [ ] 記事ページの `getStaticPaths`
-      - [ ] RSS
-      - ※ 3箇所すべて。漏れやすいので `src/lib/posts.ts` に集約する
-- [ ] `draft: true` の記事を作って、dev で見えて build で消えることを確認
+- [x] **draft フィルタを実装**（`import.meta.env.PROD` で除外）
+      - [x] 一覧ページ
+      - [x] 記事ページの `getStaticPaths`
+      - [x] RSS
+      - [x] 3箇所すべて `src/lib/posts.ts` の `getPublishedPosts()` 経由に統一した。
+            `src/pages/` `src/layouts/` から `getCollection` の直呼びは無くなっている
+- [x] `draft: true` の記事を作って、dev で見えて build で消えることを確認
+      → Middleware の記事を `draft: true` に。dev の一覧には2本並び、記事ページも 200。
+        `astro build` 後の `dist/` には HTML が生成されず、`rss.xml` にも `sitemap-0.xml` にも
+        載っていない（sitemap も自動で追随した）
 - [ ] タグの表示（一覧・記事）
 - [ ] 目次（TOC）※ 既存 Gatsby にあった機能。要否を判断
-- [ ] コードブロックのシンタックスハイライト確認（Astro は Shiki を標準搭載）
+- [x] コードブロックのシンタックスハイライト確認（Astro は Shiki を標準搭載）
+      → Phase 2 で確認済み（`astro-code github-dark`）
 - [ ] OGP / メタタグ / `<title>`
 - [ ] RSS・sitemap・404 の動作確認
-- [ ] **`npm run build` が通ることを確認**
+- [x] **`npm run build` が通ることを確認**
+- [ ] 「積み残し TODO」の「Phase 3（体裁）で扱う」2件（日付の英語表示 / 和文 Web フォント）
 
 **完了条件**: 本番ビルドが成功し、`npm run preview` で一通り閲覧できる
-
----
 
 ## Phase 4 — 画像
 
@@ -277,15 +286,15 @@
 
 ## 現在地
 
-**Phase 2 完了（2026-08-31）。次は Phase 3（ブログとしての体裁）。**
+**Phase 3 進行中（2026-08-31）。draft フィルタまで完了。**
 
 Git は Phase 5 の予定だったが、Phase 1 が一区切りなので前倒しで `git init` + 初回コミットまで実施済み
 （`main`）。GitHub へのリポジトリ作成・push はまだ（Phase 5 で確認を取ってから）。
 
-記事は1本のみ取り込み済み。
+記事は2本取り込み済み（うち Middleware の1本は `draft: true` で本番非公開）。
 
 **再開するときは、フェーズの続きに入る前に「積み残し TODO」を見ること。**
-公開前に必ず潰す項目が3つ溜まっている。
+「公開前に必ず潰す」は3件中2件を消化し、残るは Middleware 記事の下書きメモ1件。
 
 決定サマリ:
 | 論点 | 決定 |
