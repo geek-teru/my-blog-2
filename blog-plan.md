@@ -92,34 +92,53 @@
 - **Header / Footer のソーシャルリンクは Astro 公式アカウントのまま。** 本人のアカウントに
   差し替えるか、消すかは未決（Phase 3 の体裁整えで扱う）
 
-## Phase 2 — 既存記事の取り込み
+## Phase 2 — 既存記事の取り込み ✅ 完了（2026-08-31）
 
-このフェーズが今回の山場。`ws/blog` の md には frontmatter が無い（詳細は spec の5節）。
+**取り込み対象はユーザー指示により `2026-08-31-nextjs-middleware-route-protection.md` の1本のみ。**
+残り3本（`2026-08-30-nextjs-supabase-google-oauth-local` / `claude-code-with-playwright-mcp` /
+`jamstack-blog`）は取り込んでいない。
 
-- [ ] `content/blog/` をプロジェクトルート直下に作成
-- [ ] `src/content.config.ts` の glob `base` を `./content/blog` に変更
-- [ ] **`base` が `src/` の外でも解決できるか、この時点で確認する**（未検証事項）
-- [ ] スキーマを更新: `draft` (default false) と `tags` (default []) を追加、`description` を任意に
-- [ ] `scripts/import-posts.mjs` を作成
-      - タイトル = 最初の H1、無ければ最初の非空行
-      - タイトル行は本文から除去（レイアウトが h1 を出すため）
-      - 日付 = ファイル名の `YYYY-MM-DD-` プレフィックス、無ければ mtime
-      - スラッグ = ファイル名から日付プレフィックスを除去
-      - 相対 md リンク `./xxx.md` → `/blog/<slug>/` に張り替え
-      - **既存ファイルは上書きしない**（`--force` のときだけ）
-      - frontmatter がすでにあるファイルは素通し（冪等）
-      - `.md` のみ対象。`.html` は無視
-- [ ] 取り込みを実行
-- [ ] **4記事すべてをブラウザで開いて確認**
-      - [ ] タイトルが二重に出ていないか（H1 除去の確認）
-      - [ ] 日付なし2本（`claude-code-with-playwright-mcp` / `jamstack-blog`）が妥当な日付になっているか
-      - [ ] タイトルが H1 でない2本のタイトルが正しく拾えているか
-      - [ ] 記事間リンクが `/blog/<slug>/` になり、リンク先が開くか
-      - [ ] コードブロックが崩れていないか
+- [x] `content/blog/` をプロジェクトルート直下に作成
+- [x] `src/content.config.ts` の glob `base` を `./content/blog` に変更
+- [x] **`base` が `src/` の外でも解決できるか確認** → **できる。dev / build の両方で確認済み**
+      （未検証事項がひとつ潰れた。blog-spec.md 8節も更新済み）
+- [x] スキーマを更新: `draft` (default false) と `tags` (default []) を追加、`description` を任意に
+- [x] `scripts/import-posts.mjs` を作成（仕様は spec 5節どおり。ファイル指定の引数を追加）
+- [x] 取り込みを実行 → `content/blog/nextjs-middleware-route-protection.md`
+- [x] ブラウザで確認
+      - [x] タイトルが二重に出ていない（`main h1` は1つだけ）
+      - [x] 記事間リンクが `/blog/<slug>/` に張り替わっている
+      - [x] コードブロック 10 個すべて Shiki のハイライトが効いている（`astro-code github-dark`）
+      - [x] 表 2 個が崩れず、横スクロールも発生していない
+      - [x] `npx astro build` が通る（4ページ生成）
 
-**完了条件**: 既存4記事が一覧に並び、すべて開けて内容が崩れていない
+**完了条件**: 既存記事が一覧に並び、開けて内容が崩れていない → **達成**
 
----
+### Phase 2 で見つかった、記事側の要対応
+
+1. **`/blog/nextjs-supabase-google-oauth-local/` へのリンクが 404 になる。**
+   本文中の「前回の記事」リンクを plan どおり `/blog/<slug>/` に張り替えたが、
+   リンク先の記事は取り込み対象外のため存在しない。
+   → 対応案: (a) その1本も取り込む (b) リンクを外して素のテキストにする
+   (c) 公開までに解消すればよいので放置。**未決**
+2. **本文に下書きメモが残っている。**
+   「はじめに」直下の引用ブロックが
+   `> ここは下書きです。動機まわりはご自身の言葉に差し替えてください。` のまま。
+   公開するとそのまま出る。**未決**
+
+### Phase 3 に送った積み残し
+
+- 日付の表示が `Aug 31, 2026` と英語のまま（`FormattedDate.astro` の locale が `en-us`）
+- Header / Footer のソーシャルリンクが Astro 公式アカウントのまま（Phase 1 からの持ち越し）
+
+### 取り込みスクリプトについてのメモ
+
+1本しか通していないため、**以下の分岐は未検証のまま**残っている。
+残り3本を取り込むことになったら、ここが初めて動く。
+
+- 日付フォールバック（ファイル名に `YYYY-MM-DD-` が無いとき mtime を使う）
+- タイトルが H1 でない場合のフォールバック（最初の非空行を使う）
+- frontmatter 済みファイルの素通し
 
 ## Phase 3 — ブログとしての体裁
 
@@ -226,10 +245,13 @@
 
 ## 現在地
 
-**Phase 1 完了（2026-08-31）。次は Phase 2（既存記事の取り込み）＝ 今回の山場。**
+**Phase 2 完了（2026-08-31）。次は Phase 3（ブログとしての体裁）。**
 
 Git は Phase 5 の予定だったが、Phase 1 が一区切りなので前倒しで `git init` + 初回コミットまで実施済み
-（`main` / `b3f92af`）。GitHub へのリポジトリ作成・push はまだ（Phase 5 で確認を取ってから）。
+（`main`）。GitHub へのリポジトリ作成・push はまだ（Phase 5 で確認を取ってから）。
+
+記事は1本のみ取り込み済み。Phase 2 で見つかった「404 になるリンク」と「本文に残った下書きメモ」は
+**未決のまま Phase 3 に持ち越している**。
 
 決定サマリ:
 | 論点 | 決定 |
