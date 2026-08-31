@@ -50,13 +50,13 @@
 
 ### Phase 3（体裁）で扱う
 
-- [ ] **日付の表示が英語のまま**
-      `Aug 31, 2026` と出る。`src/components/FormattedDate.astro` の locale が `en-us`。
-      日本語ブログなので `ja-JP` に寄せる。→ 出どころ: Phase 2
-- [ ] **和文 Web フォントを入れるか再検討する**
-      Phase 1 では OS 同梱のゴシックへのフォールバックで通した。意匠として
-      Noto Sans JP 等を配信するなら、CJK のサブセット指定（`subsets` に `japanese`）に注意。
-      → 出どころ: Phase 1
+- [x] ~~**日付の表示が英語のまま**~~
+      → **2026-08-31 対応済み。** locale を `ja-JP` / `month: 'long'` にして `2026年8月31日` に。
+      あわせて `Last updated on` を「最終更新:」に。→ 出どころ: Phase 2
+- [x] ~~**和文 Web フォントを入れるか再検討する**~~
+      → **2026-08-31 判断: 入れない。現状の OS 同梱フォントのままとする。**
+      CJK の Web フォントは配信量が桁違いに大きく、読みやすさの改善に見合わない。
+      意匠を作り込む段になったら蒸し返す。→ 出どころ: Phase 1
 
 ### 後続フェーズ待ち・判断待ち
 
@@ -70,6 +70,18 @@
         TOML / シェルのコメント行（`# ...`）を見出しと誤認する不具合が見つかり修正した。
         タイトルが H1 でない残り2本はこの罠を踏みやすいので、取り込み時は結果を目視すること。
       → 出どころ: Phase 2
+- [ ] **OGP 画像が Astro のプレースホルダ画像のまま**
+      `src/assets/blog-placeholder-1.jpg` が全ページの `og:image` の既定値になっている。
+      SNS に貼ると Astro のサンプル画像が出る。記事ごとの `heroImage` か、
+      サイト共通の OGP 画像を用意するか。→ 出どころ: Phase 3
+- [ ] **タグが表示だけで、リンクになっていない**
+      タグ別の一覧ページ（`/tags/<tag>/`）を作るかは未判断。
+      作らないなら、タグはあくまで記事の属性表示にとどまる。→ 出どころ: Phase 3
+- [ ] **型チェックが機械で回っていない**
+      `astro build` は型を見ないため、`astro check`（要 `@astrojs/check` + `typescript`）が無いと
+      Props の不整合が本番まで残る。実際 Phase 3 で `BaseHead` の `description` が
+      必須のままになっていたのを目視で見つけた。依存を1つ増やす判断が要る。
+      → 出どころ: Phase 3
 - [ ] **git の `user.email` がグローバル設定ではプレースホルダのまま**
       `you@example.com`。このリポジトリだけローカル設定で修正済みだが、
       他プロジェクトも同じ状態の可能性が高い。
@@ -177,28 +189,39 @@
 - 日付の表示が英語のまま（Phase 3 で扱う）
 - `import-posts.mjs` の3分岐が未検証（残り3本を取り込むときが初回実行）
 
-## Phase 3 — ブログとしての体裁 🚧 進行中
+## Phase 3 — ブログとしての体裁 ✅ 完了（2026-08-31）
 
 - [x] **draft フィルタを実装**（`import.meta.env.PROD` で除外）
-      - [x] 一覧ページ
-      - [x] 記事ページの `getStaticPaths`
-      - [x] RSS
-      - [x] 3箇所すべて `src/lib/posts.ts` の `getPublishedPosts()` 経由に統一した。
-            `src/pages/` `src/layouts/` から `getCollection` の直呼びは無くなっている
+      - [x] 一覧ページ / 記事ページの `getStaticPaths` / RSS の3箇所すべて
+      - [x] `src/lib/posts.ts` の `getPublishedPosts()` に集約。
+            `src/pages/` `src/layouts/` から `getCollection` の直呼びは無い
 - [x] `draft: true` の記事を作って、dev で見えて build で消えることを確認
-      → Middleware の記事を `draft: true` に。dev の一覧には2本並び、記事ページも 200。
-        `astro build` 後の `dist/` には HTML が生成されず、`rss.xml` にも `sitemap-0.xml` にも
-        載っていない（sitemap も自動で追随した）
-- [ ] タグの表示（一覧・記事）
-- [ ] 目次（TOC）※ 既存 Gatsby にあった機能。要否を判断
-- [x] コードブロックのシンタックスハイライト確認（Astro は Shiki を標準搭載）
-      → Phase 2 で確認済み（`astro-code github-dark`）
-- [ ] OGP / メタタグ / `<title>`
-- [ ] RSS・sitemap・404 の動作確認
-- [x] **`npm run build` が通ることを確認**
-- [ ] 「積み残し TODO」の「Phase 3（体裁）で扱う」2件（日付の英語表示 / 和文 Web フォント）
+      → dev の一覧に2本、記事ページも 200。`astro build` 後は `dist/` に HTML が無く、
+        `rss.xml` にも `sitemap-0.xml` にも載らない
+- [x] タグの表示（一覧・記事）→ `src/components/Tags.astro`
+- [x] 目次（TOC）→ **入れる判断で実装。** `src/components/TableOfContents.astro`
+      h2 / h3 を拾い、2項目以上あるときだけ出す。18項目でアンカーの解決を確認
+- [x] コードブロックのシンタックスハイライト確認（Phase 2 で確認済み）
+- [x] OGP / メタタグ / `<title>`
+      → `<title>` に `| サイト名` を付与（トップは二重にしない）。
+        記事ページの `og:type` を `article` に。`BaseHead` の `description` を任意化
+- [x] RSS・sitemap・404 の動作確認
+      → 404 ページが雛形に無かったので `src/pages/404.astro` を新規作成
+- [x] **`npm run build` が通ることを確認**（5ページ）
 
-**完了条件**: 本番ビルドが成功し、`npm run preview` で一通り閲覧できる
+**完了条件**: 本番ビルドが成功し、`npm run preview` で一通り閲覧できる → **達成**
+
+### Phase 3 で見つけて直した不具合
+
+- **`BaseHead` の `description` が必須のままだった。** Phase 2 でスキーマ上は任意にしたのに
+  Props 側が追随しておらず、型と実態がずれていた。既定値を `SITE_DESCRIPTION` にして解消
+- **`/about` のビルドが `Tags` で落ちた。** about ページはコレクション経由ではなく
+  `BlogPost` レイアウトを直接使うため `tags` が undefined になる。
+  受け取る側（`Tags` / `BlogPost`）で既定値 `[]` を持たせて解消。
+  `headings` も同じ理由で任意にしてある
+- **タグの寄せが一覧の見出しと揃わなかった。** 雛形は先頭の1件だけ中央寄せなので、
+  flex の `justify-content` で中央固定にすると必ずどこかで崩れる。
+  `li` を `inline-block` にして親の `text-align` に追従させた
 
 ## Phase 4 — 画像
 
@@ -286,7 +309,7 @@
 
 ## 現在地
 
-**Phase 3 進行中（2026-08-31）。draft フィルタまで完了。**
+**Phase 3 完了（2026-08-31）。次は Phase 4（画像）。**
 
 Git は Phase 5 の予定だったが、Phase 1 が一区切りなので前倒しで `git init` + 初回コミットまで実施済み
 （`main`）。GitHub へのリポジトリ作成・push はまだ（Phase 5 で確認を取ってから）。
@@ -295,6 +318,7 @@ Git は Phase 5 の予定だったが、Phase 1 が一区切りなので前倒�
 
 **再開するときは、フェーズの続きに入る前に「積み残し TODO」を見ること。**
 「公開前に必ず潰す」は3件中2件を消化し、残るは Middleware 記事の下書きメモ1件。
+Phase 3 で新たに3件（OGP 画像 / タグのリンク化 / 型チェックの自動化）を積んでいる。
 
 決定サマリ:
 | 論点 | 決定 |

@@ -1,19 +1,23 @@
 ---
 import { Image } from 'astro:assets';
+import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import Tags from '../components/Tags.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+// about ページなどコレクション外からも使われるため、headings は任意にしておく
+type Props = CollectionEntry<'blog'>['data'] & { headings?: MarkdownHeading[] };
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, tags = [], heroImage, headings } = Astro.props;
 ---
 
 <html lang="ja">
 	<head>
-		<BaseHead title={title} description={description} />
+		<BaseHead title={title} description={description} type="article" />
 		<style>
 			main {
 				width: calc(100% - 2em);
@@ -69,14 +73,16 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 							{
 								updatedDate && (
 									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
+										最終更新: <FormattedDate date={updatedDate} />
 									</div>
 								)
 							}
 						</div>
 						<h1>{title}</h1>
+						<Tags tags={tags} />
 						<hr />
 					</div>
+					<TableOfContents headings={headings} />
 					<slot />
 				</div>
 			</article>

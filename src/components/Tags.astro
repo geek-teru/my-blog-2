@@ -1,0 +1,53 @@
+---
+interface Props {
+	/**
+	 * 任意。about ページのようにコレクション経由でないところからも
+	 * BlogPost レイアウトが使われるため、渡ってこない場合がある。
+	 */
+	tags?: string[];
+	/** 一覧の中に置くときは小さめにする */
+	compact?: boolean;
+}
+
+const { tags = [], compact = false } = Astro.props;
+---
+
+{
+	tags.length > 0 && (
+		<ul class:list={['tags', { compact }]}>
+			{tags.map((tag) => (
+				<li>{tag}</li>
+			))}
+		</ul>
+	)
+}
+
+<style>
+	/*
+	  寄せは親の text-align に任せる。一覧は先頭の1件だけ中央寄せ、記事ページの
+	  タイトル周りも中央寄せ、という具合に置き場所ごとに揃え方が違うため、
+	  ここで flex の justify-content に固定すると必ずどこかで揃わなくなる。
+	  li を inline-block にしておけば、親の指定にそのまま追従する。
+	*/
+	.tags {
+		margin: 0.6em -0.2em 0;
+		padding: 0;
+		list-style: none;
+	}
+	.tags li {
+		display: inline-block;
+		margin: 0.2em;
+		padding: 0.15em 0.7em;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 999px;
+		background: rgba(var(--gray-light), 35%);
+		color: rgb(var(--gray));
+		font-size: 0.8rem;
+		line-height: 1.6;
+		white-space: nowrap;
+	}
+	.tags.compact li {
+		padding: 0.1em 0.6em;
+		font-size: 0.7rem;
+	}
+</style>

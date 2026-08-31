@@ -1,0 +1,64 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+	headings?: MarkdownHeading[];
+}
+
+const { headings = [] } = Astro.props;
+
+// h1 は記事タイトルとしてレイアウト側が出しているので拾わない。
+// h4 以降まで並べると目次のほうが長くなるので h2 / h3 に絞る。
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+	items.length > 1 && (
+		<nav class="toc" aria-label="目次">
+			<h2 class="toc-title">目次</h2>
+			<ol>
+				{items.map((heading) => (
+					<li class:list={[`depth-${heading.depth}`]}>
+						<a href={`#${heading.slug}`}>{heading.text}</a>
+					</li>
+				))}
+			</ol>
+		</nav>
+	)
+}
+
+<style>
+	.toc {
+		margin: 0 0 2.5em;
+		padding: 1em 1.5em;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 12px;
+		background: rgba(var(--gray-light), 25%);
+	}
+	.toc-title {
+		margin: 0 0 0.5em;
+		font-size: 1rem;
+		color: rgb(var(--gray-dark));
+	}
+	.toc ol {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.toc li {
+		margin: 0.3em 0;
+		line-height: 1.5;
+	}
+	.toc li.depth-3 {
+		padding-left: 1.2em;
+		font-size: 0.9rem;
+	}
+	.toc a {
+		color: rgb(var(--gray-dark));
+		text-decoration: none;
+	}
+	.toc a:hover {
+		color: var(--accent);
+		text-decoration: underline;
+	}
+</style>

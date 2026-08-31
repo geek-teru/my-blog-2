@@ -2,7 +2,7 @@
 title: "Next.js 16 + Supabase のローカル環境で Google ログインを実装してハマった4点"
 description: "タスク管理アプリを作るにあたって、まず認証だけを独立して完成させたかったのです。"
 pubDate: 2026-08-30
-tags: []
+tags: ["Next.js", "Supabase", "認証", "Docker"]
 draft: false
 ---
 ## 3行まとめ

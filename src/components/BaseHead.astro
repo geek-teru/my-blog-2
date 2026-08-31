@@ -4,18 +4,30 @@
 import '../styles/global.css';
 import type { ImageMetadata } from 'astro';
 import FallbackImage from '../assets/blog-placeholder-1.jpg';
-import { SITE_TITLE } from '../consts';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { Font } from 'astro:assets';
 
 interface Props {
 	title: string;
-	description: string;
+	/** 移行元の記事には無いことがあるので任意。無ければサイト全体の説明で埋める */
+	description?: string;
 	image?: ImageMetadata;
+	/** 記事ページは 'article'。OGP の og:type に渡す */
+	type?: 'website' | 'article';
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = FallbackImage } = Astro.props;
+const {
+	title,
+	description = SITE_DESCRIPTION,
+	image = FallbackImage,
+	type = 'website',
+} = Astro.props;
+
+// タブやシェア先で、どのサイトの記事か分かるようにサイト名を添える。
+// トップページは SITE_TITLE そのものなので二重にしない。
+const pageTitle = title === SITE_TITLE ? title : `${title} | ${SITE_TITLE}`;
 ---
 
 <!-- Global Metadata -->
@@ -38,13 +50,13 @@ const { title, description, image = FallbackImage } = Astro.props;
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Primary Meta Tags -->
-<title>{title}</title>
+<title>{pageTitle}</title>
 <meta name="description" content={description} />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={type} />
 <meta property="og:url" content={Astro.url} />
-<meta property="og:title" content={title} />
+<meta property="og:title" content={pageTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image.src, Astro.url)} />
 
