@@ -15,78 +15,94 @@ type Props = CollectionEntry<'blog'>['data'] & { headings?: MarkdownHeading[] };
 const { title, description, pubDate, updatedDate, tags = [], heroImage, headings } = Astro.props;
 ---
 
+<!doctype html>
 <html lang="ja">
 	<head>
 		<BaseHead title={title} description={description} type="article" />
-		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
-			}
-			.hero-image {
-				width: 100%;
-			}
-			.hero-image img {
-				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
-			}
-		</style>
 	</head>
-
 	<body>
 		<Header />
 		<main>
 			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
-				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										最終更新: <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1>{title}</h1>
-						<Tags tags={tags} />
-						<hr />
+				<header class="post-head">
+					<div class="meta">
+						<FormattedDate date={pubDate} />
+						{
+							updatedDate && (
+								<span class="updated">
+									最終更新 <FormattedDate date={updatedDate} />
+								</span>
+							)
+						}
 					</div>
-					<TableOfContents headings={headings} />
+					<h1>{title}</h1>
+					<Tags tags={tags} />
+				</header>
+
+				{
+					heroImage && (
+						<figure class="hero">
+							<Image width={1200} height={600} src={heroImage} alt="" />
+						</figure>
+					)
+				}
+
+				<TableOfContents headings={headings} />
+
+				<div class="prose">
 					<slot />
 				</div>
 			</article>
+
+			<nav class="post-foot">
+				<a href="/blog">← 記事一覧へ</a>
+			</nav>
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+	/*
+	  記事の頭は左揃えにしている。雛形は中央寄せだったが、日本語の長いタイトルは
+	  3行以上に折り返すことがあり、中央寄せだと行頭が揃わず読み出しにくい。
+	*/
+	.post-head {
+		margin-bottom: 2rem;
+		padding-bottom: 1.5rem;
+		border-bottom: 1px solid rgb(var(--gray-light));
+	}
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.8rem;
+		margin-bottom: 0.5rem;
+		color: rgb(var(--gray));
+		font-size: 0.82rem;
+		line-height: 1.6;
+	}
+	.post-head h1 {
+		margin-bottom: 0.6rem;
+	}
+	.hero {
+		margin: 0 0 2rem;
+	}
+	.hero :global(img) {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+	.post-foot {
+		margin-top: 4rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid rgb(var(--gray-light));
+		font-size: 0.92rem;
+	}
+	.post-foot a {
+		text-decoration: none;
+	}
+	.post-foot a:hover {
+		text-decoration: underline;
+	}
+</style>

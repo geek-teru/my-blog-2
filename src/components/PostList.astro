@@ -1,0 +1,91 @@
+---
+import FormattedDate from './FormattedDate.astro';
+import Tags from './Tags.astro';
+import type { Post } from '../lib/posts';
+
+interface Props {
+	posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+{
+	posts.length === 0 ? (
+		<p class="empty">まだ記事がありません。</p>
+	) : (
+		<ul class="posts">
+			{posts.map((post) => (
+				<li>
+					<article>
+						<div class="meta">
+							<FormattedDate date={post.data.pubDate} />
+							{post.data.draft && <span class="draft">下書き</span>}
+						</div>
+						<h2>
+							<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+						</h2>
+						{post.data.description && <p class="excerpt">{post.data.description}</p>}
+						<Tags tags={post.data.tags} compact />
+					</article>
+				</li>
+			))}
+		</ul>
+	)
+}
+
+<style>
+	/*
+	  一覧は均一な縦並びにしている。雛形は「先頭1件だけ巨大カード + 2カラム」だったが、
+	  記事が数本しかない段階だと、1本目だけが不自然に目立って残りが取り残される。
+	*/
+	.posts {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.posts li {
+		margin: 0;
+		padding: 1.8rem 0;
+		border-bottom: 1px solid rgb(var(--gray-light));
+	}
+	.posts li:first-child {
+		padding-top: 0;
+	}
+	.meta {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		color: rgb(var(--gray));
+		font-size: 0.82rem;
+		line-height: 1.6;
+	}
+	/* dev でしか出ない。本番ビルドでは draft の記事自体が除外される */
+	.draft {
+		padding: 0.05em 0.5em;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 4px;
+		background: var(--bg-subtle);
+	}
+	.posts h2 {
+		margin: 0.2rem 0 0.4rem;
+		font-size: 1.2rem;
+		line-height: 1.55;
+	}
+	.posts h2 a {
+		color: rgb(var(--black));
+		text-decoration: none;
+	}
+	.posts h2 a:hover {
+		color: var(--accent);
+	}
+	.excerpt {
+		margin: 0 0 0.5rem;
+		color: rgb(var(--gray));
+		font-size: 0.92rem;
+		line-height: 1.8;
+	}
+	.empty {
+		color: rgb(var(--gray));
+	}
+</style>
