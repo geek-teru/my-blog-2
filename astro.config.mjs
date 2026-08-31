@@ -6,8 +6,10 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	// TODO(Phase 5): Vercel が発行する実際の URL に差し替える
-	site: 'https://my-blog-2.vercel.app',
+	// my-blog-2.vercel.app は別のユーザーに取られており、まったく無関係のサイトが出る。
+	// canonical / RSS / sitemap / OGP がすべてそこを指してしまうので絶対に使わないこと。
+	// Vercel がこのプロジェクトに割り当てたのはチーム名込みのこちら。
+	site: 'https://my-blog-2-terus-projects-8b7c1ca7.vercel.app',
 	integrations: [mdx(), sitemap()],
 	fonts: [
 		{

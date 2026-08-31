@@ -271,12 +271,27 @@ build での最適化を確認するために **一時的に `draft: false` に�
       → 公開前スキャンの結果: `.env` 等の混入なし、APIキーの実値なし。
         `blog-spec.md` の microCMS serviceId と、コミットのメールアドレスは
         **公開されることを承知のうえで**そのままにする判断（2026-08-31）
-- [ ] Vercel プロジェクトを作成し連携（★確認）
-- [ ] 本番ビルドが Vercel 上で通る
+- [x] Vercel プロジェクトを作成し連携（★確認済みで実行 / 2026-08-31）
+- [x] 本番ビルドが Vercel 上で通る → GitHub Deployment が `state: success`
+      → 本番 URL: **https://my-blog-2-terus-projects-8b7c1ca7.vercel.app**
+      → 本番で draft 記事が 404 になることも確認（draft フィルタが実環境で効いている）
 - [ ] ブランチを切って PR を作り、**Preview Deployment の URL が発行されることを確認**（要件①）
-- [ ] `astro.config.mjs` の `site` を実際の URL に更新
+- [x] `astro.config.mjs` の `site` を実際の URL に更新
 
 **完了条件**: 本番 URL で閲覧でき、PR ごとにプレビュー URL が出る
+
+### Phase 5 で踏んだ罠
+
+1. **`my-blog-2.vercel.app` は別のユーザーに取られていた。**
+   Phase 1 で仮 URL としてこの値を `site` に入れていたため、本番の RSS のリンクが
+   まるごと無関係のサイトを指していた（デプロイ後に実物を開いて発覚）。
+   Vercel がこのプロジェクトに割り当てたのはチーム名込みの
+   `my-blog-2-terus-projects-8b7c1ca7.vercel.app` のほう。
+   **仮の URL は「後で直す」ではなく「実物を開いて確かめる」までがセット。**
+2. **Vercel の Deployment Protection が既定で有効だった。**
+   本番 URL がログイン画面にリダイレクトされ、誰も記事を読めない状態だった。
+   `curl` は 200 を返すため（ログインページの 200）、ステータスコードだけ見ていると
+   気づけない。Settings → Deployment Protection → Vercel Authentication を Disabled にして解消
 
 ---
 
