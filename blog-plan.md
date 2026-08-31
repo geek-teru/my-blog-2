@@ -265,7 +265,12 @@ build での最適化を確認するために **一時的に `draft: false` に�
 
 - [x] `git init` + 初回コミット → **Phase 1 完了時点に前倒しで実施**（2026-08-31 / `main` / `b3f92af`）
       ※ `user.email` が `you@example.com` のままだったため、このリポジトリだけローカル設定で修正
-- [ ] GitHub リポジトリを作成（★確認）
+- [x] GitHub リポジトリを作成（★確認済みで実行 / 2026-08-31）
+      → https://github.com/geek-teru/my-blog-2 **public** / default branch `main`
+      → 既存の `geek-teru/my-blog`（Gatsby / `master`）には触れていないことを確認済み
+      → 公開前スキャンの結果: `.env` 等の混入なし、APIキーの実値なし。
+        `blog-spec.md` の microCMS serviceId と、コミットのメールアドレスは
+        **公開されることを承知のうえで**そのままにする判断（2026-08-31）
 - [ ] Vercel プロジェクトを作成し連携（★確認）
 - [ ] 本番ビルドが Vercel 上で通る
 - [ ] ブランチを切って PR を作り、**Preview Deployment の URL が発行されることを確認**（要件①）
