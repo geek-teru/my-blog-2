@@ -8,8 +8,9 @@ import HeaderLink from './HeaderLink.astro';
 		<a class="brand" href="/">{SITE_TITLE}</a>
 		<div class="links">
 			<HeaderLink href="/">Home</HeaderLink>
+			<HeaderLink href="/profile">Profile</HeaderLink>
+			<HeaderLink href="/career">Career</HeaderLink>
 			<HeaderLink href="/blog">Blog</HeaderLink>
-			<HeaderLink href="/about">About</HeaderLink>
 		</div>
 	</nav>
 </header>
@@ -19,9 +20,7 @@ import HeaderLink from './HeaderLink.astro';
 		position: sticky;
 		top: 0;
 		z-index: 10;
-		background: rgba(255, 255, 255, 0.85);
-		backdrop-filter: blur(8px);
-		border-bottom: 1px solid rgb(var(--gray-light));
+		background: var(--navy);
 	}
 	nav {
 		display: flex;
@@ -34,7 +33,7 @@ import HeaderLink from './HeaderLink.astro';
 		padding: 0.9rem 0;
 	}
 	.brand {
-		color: rgb(var(--black));
+		color: var(--header-fg);
 		font-weight: 700;
 		font-size: 1rem;
 		letter-spacing: 0.01em;
@@ -42,7 +41,9 @@ import HeaderLink from './HeaderLink.astro';
 	}
 	.links {
 		display: flex;
-		gap: 1.2rem;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 0.5rem 1.1rem;
 		font-size: 0.9rem;
 	}
 </style>

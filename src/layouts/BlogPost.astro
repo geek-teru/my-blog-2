@@ -5,64 +5,107 @@ import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Header from '../components/Header.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import Tags from '../components/Tags.astro';
 
-// about ページなどコレクション外からも使われるため、headings は任意にしておく
-type Props = CollectionEntry<'blog'>['data'] & { headings?: MarkdownHeading[] };
+// about ページなどコレクション外からも使われる。日付を持たない固定ページがあるので
+// pubDate も任意にし、無ければ日付行そのものを出さない
+type Props = Omit<CollectionEntry<'blog'>['data'], 'pubDate'> & {
+	pubDate?: Date;
+	headings?: MarkdownHeading[];
+};
 
 const { title, description, pubDate, updatedDate, tags = [], heroImage, headings } = Astro.props;
+
+// 目次を出すかどうかで、2カラムにするか1カラムのままにするかを決める。
+// profile / career のように見出しを持たないページで空のサイドバーを開けないため。
+// 判定条件は TableOfContents 側と揃えること。
+const hasToc = (headings ?? []).filter((h) => h.depth === 2 || h.depth === 3).length > 1;
 ---
 
 <!doctype html>
-<html lang="ja">
+<html lang="ja" class:list={{ wide: hasToc }}>
 	<head>
 		<BaseHead title={title} description={description} type="article" />
 	</head>
 	<body>
 		<Header />
-		<main>
-			<article>
-				<header class="post-head">
-					<div class="meta">
-						<FormattedDate date={pubDate} />
+		<Breadcrumbs current={title} />
+		<main class:list={['post', { 'with-side': hasToc }]}>
+			{
+				hasToc && (
+					<aside class="side">
+						<TableOfContents headings={headings} />
+					</aside>
+				)
+			}
+
+			<div class="content">
+				<article>
+					<header class="post-head">
 						{
-							updatedDate && (
-								<span class="updated">
-									最終更新 <FormattedDate date={updatedDate} />
-								</span>
+							pubDate && (
+								<div class="meta">
+									<FormattedDate date={pubDate} />
+									{updatedDate && (
+										<span class="updated">
+											最終更新 <FormattedDate date={updatedDate} />
+										</span>
+									)}
+								</div>
 							)
 						}
+						<h1>{title}</h1>
+						<Tags tags={tags} />
+					</header>
+
+					{
+						heroImage && (
+							<figure class="hero">
+								<Image width={1200} height={600} src={heroImage} alt="" />
+							</figure>
+						)
+					}
+
+					<div class="prose">
+						<slot />
 					</div>
-					<h1>{title}</h1>
-					<Tags tags={tags} />
-				</header>
+				</article>
 
-				{
-					heroImage && (
-						<figure class="hero">
-							<Image width={1200} height={600} src={heroImage} alt="" />
-						</figure>
-					)
-				}
-
-				<TableOfContents headings={headings} />
-
-				<div class="prose">
-					<slot />
-				</div>
-			</article>
-
-			<nav class="post-foot">
-				<a href="/blog">← 記事一覧へ</a>
-			</nav>
+				<nav class="post-foot">
+					<a href="/blog">← 記事一覧へ</a>
+				</nav>
+			</div>
 		</main>
 		<Footer />
 	</body>
 </html>
 
 <style>
+	/*
+	  目次があるときだけ「左に目次 / 右に本文」の2カラムにする。
+	  align-items: start を付けないと sticky が効かない（グリッド項目が
+	  行いっぱいに引き伸ばされ、動く余地が無くなるため）。
+	*/
+	.post.with-side {
+		display: grid;
+		grid-template-columns: 15rem minmax(0, 1fr);
+		gap: 3.5rem;
+		align-items: start;
+	}
+	.side {
+		position: sticky;
+		/* ヘッダーが sticky なので、その高さぶん下げないと隠れる */
+		top: 4.5rem;
+		max-height: calc(100vh - 6rem);
+		overflow-y: auto;
+	}
+	.content {
+		min-width: 0;
+	}
+
 	/*
 	  記事の頭は左揃えにしている。雛形は中央寄せだったが、日本語の長いタイトルは
 	  3行以上に折り返すことがあり、中央寄せだと行頭が揃わず読み出しにくい。
@@ -104,5 +147,17 @@ const { title, description, pubDate, updatedDate, tags = [], heroImage, headings
 	}
 	.post-foot a:hover {
 		text-decoration: underline;
+	}
+
+	/* 横に並べる余裕が無くなったら、目次を本文の上に戻す */
+	@media (max-width: 60rem) {
+		.post.with-side {
+			display: block;
+		}
+		.side {
+			position: static;
+			max-height: none;
+			margin-bottom: 2.5rem;
+		}
 	}
 </style>

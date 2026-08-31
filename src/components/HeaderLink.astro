@@ -14,17 +14,18 @@ const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 </a>
 
 <style>
+	/* ネイビー地に載るので、本文のリンク色ではなくヘッダー用の色を使う */
 	a {
 		display: inline-block;
-		color: rgb(var(--gray));
+		color: var(--header-fg-muted);
 		text-decoration: none;
 	}
 	a:hover {
-		color: rgb(var(--black));
+		color: var(--header-fg);
 	}
 	/* 現在地は太字だけで示す。下線は本文のリンクと紛らわしい */
 	a.active {
-		color: rgb(var(--black));
+		color: var(--header-fg);
 		font-weight: 700;
 	}
 </style>

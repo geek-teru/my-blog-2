@@ -1,6 +1,7 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Header from '../components/Header.astro';
 import PostList from '../components/PostList.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
@@ -12,12 +13,13 @@ const hasMore = posts.length > latest.length;
 ---
 
 <!doctype html>
-<html lang="ja">
+<html lang="ja" class="wide">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
 		<Header />
+		<Breadcrumbs />
 		<main>
 			<section class="intro">
 				<h1>{SITE_TITLE}</h1>

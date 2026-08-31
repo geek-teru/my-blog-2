@@ -1,0 +1,99 @@
+---
+interface Props {
+	/** 末尾の項目に出す名前。記事ページのようにスラッグでは意味が通らない場所で渡す */
+	current?: string;
+}
+
+const { current } = Astro.props;
+
+// パスから機械的に組み立てる。ページごとに手で持たせると、
+// 増やしたページで付け忘れたり、実際の階層とずれたりする。
+const LABELS: Record<string, string> = {
+	blog: 'Blog',
+	profile: 'Profile',
+	career: 'Career',
+};
+
+const segments = Astro.url.pathname.split('/').filter(Boolean);
+
+const trail = segments.map((segment, i) => {
+	const isLast = i === segments.length - 1;
+	return {
+		href: `/${segments.slice(0, i + 1).join('/')}/`,
+		label: isLast && current ? current : (LABELS[segment] ?? segment),
+		isLast,
+	};
+});
+---
+
+{
+	trail.length > 0 && (
+		<nav class="crumbs" aria-label="パンくずリスト">
+			<div class="inner">
+				<ol>
+					<li>
+						<a href="/">Home</a>
+					</li>
+					{trail.map((crumb) => (
+						<li>
+							{crumb.isLast ? (
+								<span aria-current="page">{crumb.label}</span>
+							) : (
+								<a href={crumb.href}>{crumb.label}</a>
+							)}
+						</li>
+					))}
+				</ol>
+			</div>
+		</nav>
+	)
+}
+
+<style>
+	/* 帯にはせず、本文と同じ列の中に文字だけ置く */
+	.inner {
+		width: var(--measure);
+		max-width: calc(100% - 2.5rem);
+		margin: 0 auto;
+		padding: 1.6rem 0 0;
+	}
+	ol {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		color: rgb(var(--gray));
+		font-size: 0.78rem;
+		line-height: 1.6;
+	}
+	li {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin: 0;
+	}
+	/* 区切りは CSS で入れる。markup に置くと読み上げにも拾われる */
+	li + li::before {
+		content: '>';
+		color: rgb(var(--gray));
+		font-size: 0.9em;
+	}
+	a {
+		color: var(--accent);
+		text-decoration: none;
+	}
+	a:hover {
+		text-decoration: underline;
+	}
+	[aria-current='page'] {
+		color: rgb(var(--gray-dark));
+		/* 長い記事タイトルでも1行に収める */
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		max-width: 32rem;
+	}
+</style>

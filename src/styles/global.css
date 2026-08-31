@@ -20,8 +20,22 @@
 	--bg: #ffffff;
 	--bg-subtle: #f7f8fa;
 
+	/* 現在地など「いまここ」を示す水色。--accent より明るくして印として目立たせる */
+	--accent-light: #3d9ae0;
+	--accent-soft: rgba(61, 154, 224, 0.14);
+
+	/* グローバルヘッダー専用。濃い地に載る文字色もここで持つ */
+	--navy: #16233f;
+	--header-fg: #ffffff;
+	--header-fg-muted: rgba(255, 255, 255, 0.7);
+
+	/* 記事本文の読みやすい幅。カードを3列並べる一覧だけ .wide で広げる */
 	--measure: 44rem;
 	--radius: 8px;
+}
+
+html.wide {
+	--measure: 64rem;
 }
 
 body {
@@ -61,6 +75,11 @@ main {
 	padding: 3.5rem 0 5rem;
 }
 
+/* パンくずが上にある場合は、その分だけ本文の上余白を詰める */
+.crumbs + main {
+	padding-top: 1.6rem;
+}
+
 /* 見出し。和文は 1.2 だと行が重なって見えるので 1.5 前後を確保する */
 h1,
 h2,
@@ -89,6 +108,14 @@ h4 {
 h5,
 h6 {
 	font-size: 0.95rem;
+}
+
+/*
+  アンカーで飛んだとき、見出しが sticky ヘッダーの下に潜らないよう逃がす。
+  目次のリンク先が隠れて「どこに飛んだか分からない」状態を防ぐ。
+*/
+.prose :is(h2, h3, h4, h5, h6) {
+	scroll-margin-top: 5rem;
 }
 
 /* 本文中の見出しは、前の節との間を空けて区切りを作る */
