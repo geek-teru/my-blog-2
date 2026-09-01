@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<title>スタイルガイド | Teru's Blog</title>
+		<title>スタイルガイド | Teru's Home</title>
 		<style>
 			/*
 			  このファイルは src/styles/global.css の値を書き写したもの。
@@ -304,6 +304,37 @@
 				font-weight: 700;
 			}
 
+			.demo-header-nav {
+				padding: 0.5rem 1.2rem;
+				border-top: 1px solid rgba(255, 255, 255, 0.12);
+				background: var(--navy);
+			}
+			.demo-header-nav nav {
+				display: flex;
+				gap: 1.1rem;
+				font-size: 0.9rem;
+			}
+			.demo-header-nav nav span {
+				color: var(--header-fg-muted);
+			}
+			.demo-header-nav nav span.active {
+				color: var(--header-fg);
+				font-weight: 700;
+			}
+			.demo-search {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 0.5rem;
+				width: 11rem;
+				padding: 0.3rem 0.7rem;
+				border: 1px solid rgba(255, 255, 255, 0.18);
+				border-radius: 999px;
+				background: rgba(255, 255, 255, 0.08);
+				color: var(--header-fg-muted);
+				font-size: 0.8rem;
+			}
+
 			/* パンくずのサンプル */
 			.demo-crumbs {
 				display: flex;
@@ -507,6 +538,7 @@
 					<li><a href="#type">文字</a></li>
 					<li><a href="#layout">レイアウト</a></li>
 					<li><a href="#components">コンポーネント</a></li>
+					<li><a href="#motion">動き</a></li>
 					<li><a href="#rules">運用の決まり</a></li>
 				</ol>
 			</aside>
@@ -514,7 +546,7 @@
 			<main>
 				<h1 class="doc-title">スタイルガイド</h1>
 				<p class="lede">
-					Teru's Blog の見た目の決まりごと。値そのものより、<strong>なぜその値なのか</strong>を残すことを目的にしています。
+					Teru's Home の見た目の決まりごと。値そのものより、<strong>なぜその値なのか</strong>を残すことを目的にしています。
 					実装は <code>src/styles/global.css</code> と各コンポーネントにあります。
 				</p>
 
@@ -812,6 +844,11 @@
 								<td>8px</td>
 								<td>カード・画像・コードブロック・囲み</td>
 							</tr>
+							<tr>
+								<td><code>--header-h</code></td>
+								<td>実測値</td>
+								<td>sticky ヘッダーの高さ。目次の追従位置とアンカーの逃がし量が依存する</td>
+							</tr>
 						</tbody>
 					</table>
 
@@ -827,6 +864,21 @@
 						<code>TableOfContents.astro</code> のフィルタで<strong>二重に持っている</strong>ので、
 						条件を変えるときは両方直すこと。
 					</div>
+
+					<h3>ヘッダーの高さは実測する</h3>
+					<p>
+						<code>--header-h</code> に CSS の初期値を置きつつ、<code>Header.astro</code> が
+						自分の <code>offsetHeight</code> を測って上書きします。<code>ResizeObserver</code> で
+						幅の変化にも追従します。
+					</p>
+					<div class="why">
+						<strong>なぜ実測なのか:</strong>
+						目次の <code>top</code>、見出しの <code>scroll-margin-top</code>、現在地判定の
+						オフセットの3つが、すべてヘッダーの高さに依存している。数値で書いておくと、
+						<strong>段数やパディングを変えた瞬間に3箇所が同時にずれる</strong>。
+						実際、ヘッダーを2段にしたときにこれが起きた。高さの出どころをヘッダー自身ひとつに絞り、
+						依存する側は変数を見るだけにしている。
+					</div>
 				</section>
 
 				<!-- ============ コンポーネント ============ -->
@@ -836,9 +888,15 @@
 
 					<h3>グローバルヘッダー</h3>
 					<div class="demo">
-						<div class="demo-label">HEADER — sticky / --navy</div>
+						<div class="demo-label">HEADER — sticky / --navy / 2段</div>
 						<div class="demo-header">
-							<span class="brand">Teru's Blog</span>
+							<span class="brand">Teru's Home</span>
+							<span class="demo-search">
+								<span class="ph">記事を検索</span>
+								<span class="mag" aria-hidden="true">&#9906;</span>
+							</span>
+						</div>
+						<div class="demo-header-nav">
 							<nav>
 								<span>Home</span>
 								<span>Profile</span>
@@ -847,7 +905,60 @@
 							</nav>
 						</div>
 					</div>
-					<p>現在地は太字と不透明度だけで示します。下線は本文のリンクと紛らわしいため使いません。</p>
+					<p>
+						1段目にサイト名と検索窓、2段目にメニュー。現在地は太字と不透明度だけで示します。
+						下線は本文のリンクと紛らわしいため使いません。
+					</p>
+					<div class="why">
+						<strong>2段の区切りについて:</strong>
+						2段目は白 12% の細い罫線で分けるだけにしている。別の色を敷くと、
+						ひとつのヘッダーではなく<strong>帯が二つ並んでいるように見える</strong>。
+						<br /><br />
+						<strong>濃い地に載る文字色を専用トークンにしている理由:</strong>
+						サイト名も検索窓の文字もネイビーの上に載るので、本文用のグレーとは別に
+						<code>--header-fg</code> / <code>--header-fg-muted</code> を持つ。
+						共用すると片方の調整でもう片方が壊れる。
+					</div>
+
+					<h3>検索</h3>
+					<p>
+						静的サイトなのでサーバー側では絞り込めません。ビルド時に
+						<code>/search-index.json</code> を書き出し、<code>/search</code> がそれを読んで
+						ブラウザ側で絞り込みます。
+					</p>
+					<table>
+						<thead>
+							<tr>
+								<th>決めごと</th>
+								<th>内容</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>検索窓</td>
+								<td>
+									素の <code>form method="get"</code>。JS が無くても
+									<code>/search?q=</code> に飛ぶ
+								</td>
+							</tr>
+							<tr>
+								<td>索引の対象</td>
+								<td>タイトル・説明・タグ・本文。本文は1記事 4000 字で打ち切る</td>
+							</tr>
+							<tr>
+								<td>索引から外すもの</td>
+								<td>コードブロック。記号だらけでノイズになる</td>
+							</tr>
+							<tr>
+								<td>絞り込み</td>
+								<td>空白区切りの AND。日本語は単語で切れないので単純な部分一致</td>
+							</tr>
+							<tr>
+								<td>検索結果ページ</td>
+								<td><code>noindex</code></td>
+							</tr>
+						</tbody>
+					</table>
 
 					<h3>パンくず</h3>
 					<div class="demo">
@@ -1005,6 +1116,71 @@
 					</p>
 				</section>
 
+				<!-- ============ 動き ============ -->
+				<section id="motion">
+					<h2>動き</h2>
+					<p>トップページのアイキャッチと、読書中の補助だけ。装飾のための動きは置きません。</p>
+
+					<h3>共通の決まり</h3>
+					<ul>
+						<li>
+							<code>prefers-reduced-motion: reduce</code> の人には<strong>完成した状態</strong>を出す。
+							アニメーションを止めるだけだと初期値（<code>scaleY(0)</code> /
+							<code>opacity: 0</code>）で固まり、線も丸も消える
+						</li>
+						<li>外部のアニメーションライブラリは足さない</li>
+						<li>動いている間にレイアウトがずれない。高さは先に確保する</li>
+						<li>本文は最初から HTML に入れる。JS で組み立てると、動かない環境で中身が消える</li>
+					</ul>
+
+					<h3>ターミナル（トップの導入）</h3>
+					<p>
+						<code>$ cat README.md</code> が打ち込まれ、ひと呼吸おいて中身が出ます。
+						打鍵の間隔は 45〜100ms でばらつかせています。等間隔だと機械的に見えるためです。
+					</p>
+					<div class="why">
+						<strong>コマンドを <code>cat README.md</code> にした理由:</strong>
+						出力が「H1 + 説明文」という形になり、<code>&lt;h1&gt;</code> をそのまま出力行として
+						使える。<code>whoami</code> だとサイト名が出るのが不自然になる。
+						<br /><br />
+						<strong>打ち始める前に高さを固定している:</strong>
+						打つにつれて背が伸びると、下のコミットグラフが押し下げられて画面が揺れる。
+						代償として打っている 1.5 秒ほどは枠内に空白ができるが、揺れないほうを選んだ。
+						隠すのに <code>display: none</code> ではなく <code>visibility: hidden</code> を
+						使うのも、高さを失わないため。
+					</div>
+
+					<h3>コミットグラフ（トップの記事一覧）</h3>
+					<p>
+						記事をコミットに見立てて縦のブランチ線に並べます。線が 0.9 秒かけて上から伸び、
+						それを追いかけて丸が 0.16 秒ずつずれて灯ります。
+					</p>
+					<div class="why">
+						<strong>作り話の情報は足さない:</strong>
+						コミットハッシュ風の文字列を並べればそれらしくなるが、
+						<strong>実在しない値を本物に見える形で出す</strong>ことになる。
+						線・丸・ブランチ名（実際に <code>main</code> で運用している）だけで見立てを作る。
+						<br /><br />
+						<strong>丸はグリッドの1列目に置く:</strong>
+						絶対配置にすると基準の箱が行ごとに変わり、線と丸の中心が噛み合わない。
+						同じ列に入れておけばずれようがない。実装中に2回ずらしてから、この形に落ち着いた。
+					</div>
+
+					<h3>目次の現在地</h3>
+					<p>
+						スクロール位置に応じて、いま読んでいる節を水色で示します。
+						見本と判定のしくみは<a href="#components">コンポーネント</a>の節にあります。
+					</p>
+
+					<h3>トップの構成について</h3>
+					<p>
+						トップは「ターミナル（入口の挨拶）」→「コミットグラフ（積み上がってきたもの）」の順。
+						記事一覧ページ（<code>/blog</code>）はカードのままで、
+						<strong>トップと一覧で見せ方が違います</strong>。意図的な非対称です。
+						トップは眺めるところ、一覧は探すところ、と役割が違うため。
+					</p>
+				</section>
+
 				<!-- ============ 運用の決まり ============ -->
 				<section id="rules">
 					<h2>運用の決まり</h2>
@@ -1017,6 +1193,15 @@
 						<li>記事本文の列幅 <code>44rem</code> は広げない</li>
 						<li>負のマージンで余白を打ち消さない。横スクロールの原因になる</li>
 						<li>横に溢れうるもの（表・コードブロック）は、ページではなく自分の中でスクロールさせる</li>
+						<li>
+							枠線を持つ丸や箱には <code>box-sizing: border-box</code> を明示する。
+							このプロジェクトにグローバルな <code>border-box</code> 指定は無く、
+							既定の <code>content-box</code> のままだと中心の計算に枠線ぶんが乗らない
+						</li>
+						<li>
+							JS が <code>innerHTML</code> で作った要素に、Astro のスコープ付き CSS は当たらない。
+							スコープ用の属性が付かないため。<code>:global()</code> で抜ける
+						</li>
 					</ul>
 
 					<h3>二重に持っている値</h3>
@@ -1034,10 +1219,17 @@
 								<td><code>TableOfContents.astro</code> と <code>BlogPost.astro</code> の <code>hasToc</code></td>
 							</tr>
 							<tr>
-								<td>sticky ヘッダーの高さを見込んだ余白</td>
+								<td><s>sticky ヘッダーの高さを見込んだ余白</s></td>
 								<td>
-									目次の <code>top: 4.5rem</code> / 見出しの <code>scroll-margin-top: 5rem</code> /
-									スクロール判定の <code>OFFSET = 110</code>
+									<strong>解消済み。</strong>3箇所に散っていたが、<code>Header.astro</code> が
+									実測して <code>--header-h</code> に流す形にした。依存する側は変数を見るだけ
+								</td>
+							</tr>
+							<tr>
+								<td>トップの説明文</td>
+								<td>
+									<code>consts.ts</code> の <code>SITE_DESCRIPTION</code>（メタタグ用）と
+									<code>TerminalIntro.astro</code> の本文。似た文面を別々に持っている
 								</td>
 							</tr>
 							<tr>
@@ -1052,7 +1244,16 @@
 						<li>ダークモード。トークンで組んであるので追加はしやすい</li>
 						<li>タグ別の一覧ページ。いまタグは表示だけでリンクではない</li>
 						<li>OGP 画像。既定値が Astro のプレースホルダ画像のまま</li>
-						<li>サイト名。<code>Teru's Blog</code> のままだが、扱う内容はキャリアとスキルにも広がっている</li>
+						<li>ファビコンが Astro の既定のまま。タブに出るのは Astro のロゴ</li>
+						<li>
+							トップにターミナルとコミットグラフの両方を置いている。情報量が増え、
+							静かなデザインからは一歩離れた。片方に絞る余地はある
+						</li>
+						<li>
+							グローバルな <code>box-sizing: border-box</code>。入れるべきだが、
+							既に組んだカード・検索窓・目次の寸法が一斉に変わるので、
+							各所を再確認する前提の別作業にする
+						</li>
 					</ul>
 				</section>
 			</main>
