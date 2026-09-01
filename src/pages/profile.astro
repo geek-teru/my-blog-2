@@ -1,0 +1,17 @@
+---
+import WipNotice from '../components/WipNotice.astro';
+import Layout from '../layouts/BlogPost.astro';
+---
+
+<Layout title="Profile" description="Teru のプロフィール">
+	<WipNotice />
+
+	<h2>このサイトについて</h2>
+	<p>
+		エンジニアとしての経歴とスキル、それに手を動かして学んだことの記録を置いています。
+		Astro で作り、Vercel で配信しています。記事は Markdown で書いて Git で管理しています。
+	</p>
+	<p>
+		更新は <a href="/rss.xml">RSS</a> で追えます。
+	</p>
+</Layout>

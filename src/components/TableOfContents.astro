@@ -9,13 +9,14 @@ const { headings = [] } = Astro.props;
 
 // h1 は記事タイトルとしてレイアウト側が出しているので拾わない。
 // h4 以降まで並べると目次のほうが長くなるので h2 / h3 に絞る。
+// この条件を変えるときは BlogPost 側の hasToc も揃えること。
 const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
 {
 	items.length > 1 && (
-		<nav class="toc" aria-label="目次">
-			<h2 class="toc-title">目次</h2>
+		<nav class="toc" aria-label="目次" data-toc>
+			<p class="toc-title">目次</p>
 			<ol>
 				{items.map((heading) => (
 					<li class:list={[`depth-${heading.depth}`]}>
@@ -27,18 +28,88 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 	)
 }
 
-<style>
-	.toc {
-		margin: 0 0 2.5em;
-		padding: 1em 1.5em;
-		border: 1px solid rgb(var(--gray-light));
-		border-radius: 12px;
-		background: rgba(var(--gray-light), 25%);
+<script>
+	/**
+	 * スクロール位置から「いま読んでいる節」を割り出して目次に印を付ける。
+	 *
+	 * IntersectionObserver ではなく scroll から毎回計算している。節が画面より長いと
+	 * どの見出しも交差しない瞬間が生まれ、observer だけでは現在地が消えてしまうため。
+	 * 「上端より上にある見出しのうち最後のもの」を選べば、その隙間でも途切れない。
+	 */
+	function setupToc() {
+		const toc = document.querySelector<HTMLElement>('[data-toc]');
+		if (!toc) return;
+
+		const targets = [...toc.querySelectorAll<HTMLAnchorElement>('a')]
+			.map((link) => {
+				const id = decodeURIComponent(link.getAttribute('href')?.slice(1) ?? '');
+				return { link, heading: document.getElementById(id) };
+			})
+			.filter((t): t is { link: HTMLAnchorElement; heading: HTMLElement } => t.heading !== null);
+
+		if (targets.length === 0) return;
+
+		// sticky ヘッダーの下あたりを判定線にする。高さは実測なので、
+		// ヘッダーの段数を変えても勝手に追従する
+		const header = document.querySelector<HTMLElement>('header');
+		const offset = () => (header?.offsetHeight ?? 0) + 40;
+		let current: HTMLAnchorElement | null = null;
+		let ticking = false;
+
+		function update() {
+			ticking = false;
+
+			const line = offset();
+			let active = targets[0];
+			for (const target of targets) {
+				if (target.heading.getBoundingClientRect().top <= line) active = target;
+				else break;
+			}
+
+			// 最下部では最後の節を現在地にする。短い節だと判定線に届かないため
+			const atBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 4;
+			if (atBottom) active = targets[targets.length - 1];
+
+			if (active.link === current) return;
+			current?.classList.remove('is-current');
+			active.link.classList.add('is-current');
+			current = active.link;
+
+			// 目次自体がスクロールする長さのとき、現在地が枠外に出たら追従させる
+			if (toc.scrollHeight > toc.clientHeight + 4) {
+				const linkTop = active.link.offsetTop;
+				const linkBottom = linkTop + active.link.offsetHeight;
+				if (linkTop < toc.scrollTop) toc.scrollTop = linkTop - 8;
+				else if (linkBottom > toc.scrollTop + toc.clientHeight) {
+					toc.scrollTop = linkBottom - toc.clientHeight + 8;
+				}
+			}
+		}
+
+		window.addEventListener(
+			'scroll',
+			() => {
+				if (ticking) return;
+				ticking = true;
+				requestAnimationFrame(update);
+			},
+			{ passive: true },
+		);
+		update();
 	}
+
+	setupToc();
+</script>
+
+<style>
+	/* サイドナビとして置くので、囲みは持たせず見出しの罫線だけで区切る */
 	.toc-title {
-		margin: 0 0 0.5em;
-		font-size: 1rem;
-		color: rgb(var(--gray-dark));
+		margin: 0 0 0.8rem;
+		padding-bottom: 0.6rem;
+		border-bottom: 1px solid rgb(var(--gray-light));
+		color: rgb(var(--black));
+		font-size: 0.95rem;
+		font-weight: 700;
 	}
 	.toc ol {
 		margin: 0;
@@ -46,19 +117,40 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 		list-style: none;
 	}
 	.toc li {
-		margin: 0.3em 0;
-		line-height: 1.5;
-	}
-	.toc li.depth-3 {
-		padding-left: 1.2em;
-		font-size: 0.9rem;
+		margin: 0;
 	}
 	.toc a {
+		display: block;
+		padding: 0.35rem 0 0.35rem 0.7rem;
+		/* 現在地の縦棒。透明で場所を確保しておかないと、印が付いた瞬間に字がずれる */
+		border-left: 2px solid transparent;
 		color: rgb(var(--gray-dark));
+		font-size: 0.85rem;
+		line-height: 1.6;
 		text-decoration: none;
+		transition:
+			color 0.15s ease,
+			border-color 0.15s ease;
 	}
 	.toc a:hover {
 		color: var(--accent);
-		text-decoration: underline;
+	}
+	/* 小見出しは字下げして一段小さくし、親子関係を字面で示す */
+	.toc li.depth-3 a {
+		padding-left: 1.7rem;
+		color: rgb(var(--gray));
+		font-size: 0.8rem;
+	}
+	/*
+	  現在地は色だけでなく背景も敷く。細い縦棒と文字色だけだと、
+	  目次が長いときに一覧の中で埋もれて「いまどこか」が拾えない。
+	  depth-3 は既定でグレーにしているので、ここで上書きしておく。
+	*/
+	.toc a.is-current,
+	.toc li.depth-3 a.is-current {
+		border-left-color: var(--accent-light);
+		background: var(--accent-soft);
+		color: var(--accent-light);
+		font-weight: 700;
 	}
 </style>

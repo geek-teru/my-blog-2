@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>スタイルガイド | Teru's Home</title>
+		<style>
+			/*
+			  このファイルは src/styles/global.css の値を書き写したもの。
+			  自動では同期しないので、トークンを変えたら両方直すこと。
+			*/
+			:root {
+				--accent: #2f5d9e;
+				--accent-dark: #1d3f70;
+				--black: 24, 26, 31;
+				--gray: 110, 118, 132;
+				--gray-light: 226, 230, 236;
+				--gray-dark: 46, 52, 64;
+				--bg: #ffffff;
+				--bg-subtle: #f7f8fa;
+				--accent-light: #3d9ae0;
+				--accent-soft: rgba(61, 154, 224, 0.14);
+				--navy: #16233f;
+				--header-fg: #ffffff;
+				--header-fg-muted: rgba(255, 255, 255, 0.7);
+				--radius: 8px;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				background: var(--bg);
+				color: rgb(var(--gray-dark));
+				font-family:
+					'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic Medium', 'Yu Gothic',
+					Meiryo, 'Noto Sans JP', sans-serif;
+				font-size: 16px;
+				line-height: 1.9;
+				letter-spacing: 0.02em;
+				-webkit-font-smoothing: antialiased;
+			}
+
+			.page {
+				display: grid;
+				grid-template-columns: 15rem minmax(0, 1fr);
+				gap: 3.5rem;
+				align-items: start;
+				max-width: 68rem;
+				margin: 0 auto;
+				padding: 2.5rem 1.5rem 6rem;
+			}
+
+			/* ---- サイドナビ ---- */
+			.side {
+				position: sticky;
+				top: 2.5rem;
+			}
+			.side h2 {
+				margin: 0 0 0.8rem;
+				padding-bottom: 0.6rem;
+				border-bottom: 1px solid rgb(var(--gray-light));
+				font-size: 0.95rem;
+			}
+			.side ol {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.side a {
+				display: block;
+				padding: 0.3rem 0 0.3rem 0.7rem;
+				border-left: 2px solid transparent;
+				color: rgb(var(--gray-dark));
+				font-size: 0.85rem;
+				text-decoration: none;
+			}
+			.side a:hover {
+				border-left-color: var(--accent-light);
+				background: var(--accent-soft);
+				color: var(--accent-light);
+			}
+
+			/* ---- 見出し ---- */
+			h1,
+			h2,
+			h3,
+			h4 {
+				color: rgb(var(--black));
+				line-height: 1.5;
+				font-weight: 700;
+				letter-spacing: 0.01em;
+			}
+			.doc-title {
+				margin: 0 0 0.4rem;
+				font-size: 1.95rem;
+			}
+			.lede {
+				margin: 0 0 3rem;
+				color: rgb(var(--gray));
+			}
+			section {
+				margin-bottom: 4rem;
+				scroll-margin-top: 2rem;
+			}
+			section > h2 {
+				margin: 0 0 0.4rem;
+				padding-bottom: 0.5rem;
+				border-bottom: 1px solid rgb(var(--gray-light));
+				font-size: 1.4rem;
+			}
+			section > h2 + p {
+				margin: 0 0 1.8rem;
+				color: rgb(var(--gray));
+				font-size: 0.9rem;
+			}
+			h3 {
+				margin: 2.2rem 0 0.8rem;
+				font-size: 1.05rem;
+			}
+
+			p {
+				margin: 0 0 1.2em;
+			}
+
+			code {
+				padding: 0.12em 0.4em;
+				border-radius: 4px;
+				background: rgb(var(--gray-light));
+				font-size: 0.85em;
+				letter-spacing: 0;
+			}
+
+			/* ---- 「なぜ」の注記。このガイドの中心 ---- */
+			.why {
+				margin: 1.2rem 0 0;
+				padding: 0.9rem 1.1rem;
+				border-left: 3px solid var(--accent-light);
+				background: var(--accent-soft);
+				border-radius: 0 var(--radius) var(--radius) 0;
+				font-size: 0.88rem;
+				line-height: 1.85;
+			}
+			.why strong {
+				color: rgb(var(--black));
+			}
+
+			/* ---- 色見本 ---- */
+			.swatches {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+				gap: 1rem;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.swatch {
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: var(--radius);
+				overflow: hidden;
+			}
+			.chip {
+				height: 4.5rem;
+			}
+			.swatch dl {
+				margin: 0;
+				padding: 0.7rem 0.9rem 0.9rem;
+			}
+			.swatch dt {
+				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+				font-size: 0.8rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+				letter-spacing: 0;
+			}
+			.swatch dd {
+				margin: 0.1rem 0 0;
+				color: rgb(var(--gray));
+				font-size: 0.78rem;
+				line-height: 1.7;
+			}
+			.swatch dd.value {
+				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+				letter-spacing: 0;
+			}
+
+			/* ---- 表 ---- */
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 0 0 1.2rem;
+				font-size: 0.88rem;
+				line-height: 1.7;
+			}
+			th,
+			td {
+				padding: 0.5em 0.9em;
+				border: 1px solid rgb(var(--gray-light));
+				text-align: left;
+				vertical-align: top;
+			}
+			th {
+				background: var(--bg-subtle);
+				color: rgb(var(--black));
+				white-space: nowrap;
+			}
+			td code {
+				white-space: nowrap;
+			}
+
+			/* ---- 実物のサンプル枠 ---- */
+			.demo {
+				margin: 0 0 1.2rem;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: var(--radius);
+				overflow: hidden;
+			}
+			.demo-label {
+				padding: 0.4rem 0.9rem;
+				border-bottom: 1px solid rgb(var(--gray-light));
+				background: var(--bg-subtle);
+				color: rgb(var(--gray));
+				font-size: 0.75rem;
+				letter-spacing: 0.06em;
+			}
+			.demo-body {
+				padding: 1.4rem;
+			}
+
+			/* 見出しスケールの実物 */
+			.type-row {
+				display: flex;
+				align-items: baseline;
+				gap: 1.2rem;
+				padding: 0.6rem 0;
+				border-bottom: 1px dashed rgb(var(--gray-light));
+			}
+			.type-row:last-child {
+				border-bottom: 0;
+			}
+			.type-meta {
+				flex: none;
+				width: 8rem;
+				color: rgb(var(--gray));
+				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+				font-size: 0.75rem;
+				letter-spacing: 0;
+			}
+			.t-h1 {
+				font-size: 1.95rem;
+				font-weight: 700;
+				line-height: 1.5;
+				color: rgb(var(--black));
+			}
+			.t-h2 {
+				font-size: 1.4rem;
+				font-weight: 700;
+				line-height: 1.5;
+				color: rgb(var(--black));
+			}
+			.t-h3 {
+				font-size: 1.15rem;
+				font-weight: 700;
+				line-height: 1.5;
+				color: rgb(var(--black));
+			}
+			.t-h4 {
+				font-size: 1.02rem;
+				font-weight: 700;
+				line-height: 1.5;
+				color: rgb(var(--black));
+			}
+			.t-body {
+				font-size: 1.0625rem;
+				line-height: 1.9;
+			}
+
+			/* ヘッダーのサンプル */
+			.demo-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 1.5rem;
+				padding: 0.9rem 1.2rem;
+				background: var(--navy);
+			}
+			.demo-header .brand {
+				color: var(--header-fg);
+				font-weight: 700;
+				font-size: 1rem;
+			}
+			.demo-header nav {
+				display: flex;
+				gap: 1.1rem;
+				font-size: 0.9rem;
+			}
+			.demo-header nav span {
+				color: var(--header-fg-muted);
+			}
+			.demo-header nav span.active {
+				color: var(--header-fg);
+				font-weight: 700;
+			}
+
+			.demo-header-nav {
+				padding: 0.5rem 1.2rem;
+				border-top: 1px solid rgba(255, 255, 255, 0.12);
+				background: var(--navy);
+			}
+			.demo-header-nav nav {
+				display: flex;
+				gap: 1.1rem;
+				font-size: 0.9rem;
+			}
+			.demo-header-nav nav span {
+				color: var(--header-fg-muted);
+			}
+			.demo-header-nav nav span.active {
+				color: var(--header-fg);
+				font-weight: 700;
+			}
+			.demo-search {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 0.5rem;
+				width: 11rem;
+				padding: 0.3rem 0.7rem;
+				border: 1px solid rgba(255, 255, 255, 0.18);
+				border-radius: 999px;
+				background: rgba(255, 255, 255, 0.08);
+				color: var(--header-fg-muted);
+				font-size: 0.8rem;
+			}
+
+			/* パンくずのサンプル */
+			.demo-crumbs {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.5rem;
+				color: rgb(var(--gray));
+				font-size: 0.78rem;
+			}
+			.demo-crumbs a {
+				color: var(--accent);
+				text-decoration: none;
+			}
+			.demo-crumbs .sep {
+				color: rgb(var(--gray));
+				font-size: 0.9em;
+			}
+			.demo-crumbs .current {
+				color: rgb(var(--gray-dark));
+			}
+
+			/* カードのサンプル */
+			.demo-cards {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+				gap: 1.5rem;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.card {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: var(--radius);
+				overflow: hidden;
+			}
+			.card .thumb {
+				aspect-ratio: 16 / 9;
+				background: linear-gradient(
+					135deg,
+					rgba(47, 93, 158, 0.09),
+					rgba(47, 93, 158, 0.02) 60%
+				);
+			}
+			.card .card-body {
+				display: flex;
+				flex-direction: column;
+				flex: 1;
+				padding: 1.1rem 1.2rem 1.2rem;
+			}
+			.card .meta {
+				color: rgb(var(--gray));
+				font-size: 0.78rem;
+			}
+			.card h4 {
+				margin: 0.35rem 0 0.5rem;
+				font-size: 1.02rem;
+				line-height: 1.6;
+			}
+			.card .excerpt {
+				margin: 0;
+				color: rgb(var(--gray));
+				font-size: 0.85rem;
+				line-height: 1.8;
+			}
+			.card .card-foot {
+				margin-top: auto;
+				padding-top: 0.8rem;
+			}
+
+			/* タグのサンプル */
+			.tags {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.tags li {
+				display: inline-block;
+				margin: 0.2em 0.4em 0.2em 0;
+				padding: 0.15em 0.7em;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 999px;
+				background: rgba(226, 230, 236, 0.35);
+				color: rgb(var(--gray));
+				font-size: 0.8rem;
+				line-height: 1.6;
+				white-space: nowrap;
+			}
+			.tags.compact li {
+				padding: 0.1em 0.6em;
+				font-size: 0.7rem;
+			}
+
+			/* 目次のサンプル */
+			.demo-toc {
+				max-width: 15rem;
+			}
+			.demo-toc .toc-title {
+				margin: 0 0 0.8rem;
+				padding-bottom: 0.6rem;
+				border-bottom: 1px solid rgb(var(--gray-light));
+				color: rgb(var(--black));
+				font-size: 0.95rem;
+				font-weight: 700;
+			}
+			.demo-toc ol {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.demo-toc a {
+				display: block;
+				padding: 0.35rem 0 0.35rem 0.7rem;
+				border-left: 2px solid transparent;
+				color: rgb(var(--gray-dark));
+				font-size: 0.85rem;
+				line-height: 1.6;
+				text-decoration: none;
+			}
+			.demo-toc .depth-3 a {
+				padding-left: 1.7rem;
+				color: rgb(var(--gray));
+				font-size: 0.8rem;
+			}
+			.demo-toc a.is-current {
+				border-left-color: var(--accent-light);
+				background: var(--accent-soft);
+				color: var(--accent-light);
+				font-weight: 700;
+			}
+
+			/* 作成中の箱 */
+			.wip {
+				margin: 0;
+				padding: 2rem 1.5rem;
+				border: 1px dashed rgb(var(--gray-light));
+				border-radius: var(--radius);
+				background: var(--bg-subtle);
+				color: rgb(var(--gray));
+				text-align: center;
+			}
+
+			/* 幅の対比図 */
+			.measure-demo {
+				margin: 0;
+			}
+			.measure-bar {
+				position: relative;
+				height: 2.2rem;
+				margin-bottom: 0.6rem;
+				border-radius: 4px;
+				background: var(--accent-soft);
+				border: 1px solid var(--accent-light);
+			}
+			.measure-bar span {
+				position: absolute;
+				top: 50%;
+				left: 0.7rem;
+				transform: translateY(-50%);
+				color: var(--accent-dark);
+				font-size: 0.78rem;
+				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+				letter-spacing: 0;
+			}
+			.w-44 {
+				width: 68.75%;
+			}
+			.w-64 {
+				width: 100%;
+			}
+
+			footer.doc-foot {
+				max-width: 68rem;
+				margin: 0 auto;
+				padding: 1.5rem;
+				border-top: 1px solid rgb(var(--gray-light));
+				color: rgb(var(--gray));
+				font-size: 0.82rem;
+			}
+
+			@media (max-width: 60rem) {
+				.page {
+					grid-template-columns: 1fr;
+					gap: 2rem;
+				}
+				.side {
+					position: static;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page">
+			<aside class="side">
+				<h2>目次</h2>
+				<ol>
+					<li><a href="#principles">設計の前提</a></li>
+					<li><a href="#color">色</a></li>
+					<li><a href="#type">文字</a></li>
+					<li><a href="#layout">レイアウト</a></li>
+					<li><a href="#components">コンポーネント</a></li>
+					<li><a href="#motion">動き</a></li>
+					<li><a href="#rules">運用の決まり</a></li>
+				</ol>
+			</aside>
+
+			<main>
+				<h1 class="doc-title">スタイルガイド</h1>
+				<p class="lede">
+					Teru's Home の見た目の決まりごと。値そのものより、<strong>なぜその値なのか</strong>を残すことを目的にしています。
+					実装は <code>src/styles/global.css</code> と各コンポーネントにあります。
+				</p>
+
+				<!-- ============ 設計の前提 ============ -->
+				<section id="principles">
+					<h2>設計の前提</h2>
+					<p>個別の値を決める前に置いた、共通の判断軸。</p>
+
+					<h3>和文を主役にする</h3>
+					<p>
+						出発点は Astro の blog テンプレート（Bear Blog ベース）でしたが、数値はすべて欧文向けでした。
+						日本語の記事を載せる以上、そのままでは成立しません。文字サイズ・行間・字送り・見出しスケールは
+						すべて和文基準で引き直しています。
+					</p>
+					<div class="why">
+						<strong>なぜ:</strong>
+						和文は欧文より字面が詰まり、漢字の密度が高い。欧文向けの
+						<code>line-height: 1.7</code> や本文の 3 倍を超える見出しは、日本語だと圧迫感と情報量の低下を招く。
+					</div>
+
+					<h3>囲みより罫線</h3>
+					<p>
+						影・グラデーション・塗りつぶしを減らし、1px の罫線で領域を分けています。
+						装飾を足すのは、意味の区別が必要な場所（カード、目次の現在地）に限ります。
+					</p>
+
+					<h3>読み物の幅を守る</h3>
+					<p>
+						記事本文の列幅は <code>44rem</code> から広げません。一覧ページだけ
+						<code>64rem</code> に広げ、カードを3列並べます。
+					</p>
+				</section>
+
+				<!-- ============ 色 ============ -->
+				<section id="color">
+					<h2>色</h2>
+					<p>すべて <code>:root</code> のカスタムプロパティ。直値は書きません。</p>
+
+					<h3>アクセント</h3>
+					<ul class="swatches">
+						<li class="swatch">
+							<div class="chip" style="background: #2f5d9e"></div>
+							<dl>
+								<dt>--accent</dt>
+								<dd class="value">#2f5d9e</dd>
+								<dd>本文中のリンク、パンくずのリンク</dd>
+							</dl>
+						</li>
+						<li class="swatch">
+							<div class="chip" style="background: #1d3f70"></div>
+							<dl>
+								<dt>--accent-dark</dt>
+								<dd class="value">#1d3f70</dd>
+								<dd>リンクのホバー</dd>
+							</dl>
+						</li>
+						<li class="swatch">
+							<div class="chip" style="background: #3d9ae0"></div>
+							<dl>
+								<dt>--accent-light</dt>
+								<dd class="value">#3d9ae0</dd>
+								<dd>目次の現在地。「いまここ」を示す水色</dd>
+							</dl>
+						</li>
+						<li class="swatch">
+							<div class="chip" style="background: rgba(61, 154, 224, 0.14)"></div>
+							<dl>
+								<dt>--accent-soft</dt>
+								<dd class="value">rgba(61,154,224,.14)</dd>
+								<dd>現在地の背景に敷く薄い水色</dd>
+							</dl>
+						</li>
+					</ul>
+					<div class="why">
+						<strong>なぜ水色を別に持つのか:</strong>
+						当初は現在地にも <code>--accent</code>（濃紺）を使っていたが、通常のグレー文字との差が小さく、
+						18 項目並ぶ目次の中で<strong>印として機能していなかった</strong>。
+						リンクの色と「いまここ」の色は役割が違うので、トークンを分けている。
+					</div>
+
+					<h3>グレー</h3>
+					<p>
+						<code>rgb(var(--x))</code> で使うため、値は RGB の三つ組で持っています。透明度を重ねられるようにするためです。
+					</p>
+					<ul class="swatches">
+						<li class="swatch">
+							<div class="chip" style="background: rgb(24, 26, 31)"></div>
+							<dl>
+								<dt>--black</dt>
+								<dd class="value">24, 26, 31</dd>
+								<dd>見出し、強調</dd>
+							</dl>
+						</li>
+						<li class="swatch">
+							<div class="chip" style="background: rgb(46, 52, 64)"></div>
+							<dl>
+								<dt>--gray-dark</dt>
+								<dd class="value">46, 52, 64</dd>
+								<dd>本文</dd>
+							</dl>
+						</li>
+						<li class="swatch">
+							<div class="chip" style="background: rgb(110, 118, 132)"></div>
+							<dl>
+								<dt>--gray</dt>
+								<dd class="value">110, 118, 132</dd>
+								<dd>日付、抜粋、補助的な文字</dd>
+							</dl>
+						</li>
+						<li class="swatch">
+							<div class="chip" style="background: rgb(226, 230, 236)"></div>
+							<dl>
+								<dt>--gray-light</dt>
+								<dd class="value">226, 230, 236</dd>
+								<dd>罫線、タグの枠</dd>
+							</dl>
+						</li>
+					</ul>
+
+					<h3>地色とヘッダー</h3>
+					<ul class="swatches">
+						<li class="swatch">
+							<div class="chip" style="background: #ffffff; box-shadow: inset 0 0 0 1px #e2e6ec"></div>
+							<dl>
+								<dt>--bg</dt>
+								<dd class="value">#ffffff</dd>
+								<dd>ページ全体の地</dd>
+							</dl>
+						</li>
+						<li class="swatch">
+							<div class="chip" style="background: #f7f8fa; box-shadow: inset 0 0 0 1px #e2e6ec"></div>
+							<dl>
+								<dt>--bg-subtle</dt>
+								<dd class="value">#f7f8fa</dd>
+								<dd>表の見出し、作成中の箱</dd>
+							</dl>
+						</li>
+						<li class="swatch">
+							<div class="chip" style="background: #16233f"></div>
+							<dl>
+								<dt>--navy</dt>
+								<dd class="value">#16233f</dd>
+								<dd>グローバルヘッダーの地</dd>
+							</dl>
+						</li>
+						<li class="swatch">
+							<div class="chip" style="background: #16233f; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.7); font-size: .8rem">
+								muted / <span style="color: #fff">fg</span>
+							</div>
+							<dl>
+								<dt>--header-fg</dt>
+								<dd class="value">#fff / rgba(#fff,.7)</dd>
+								<dd>ネイビー地に載る文字。本文用のグレーとは共用しない</dd>
+							</dl>
+						</li>
+					</ul>
+					<div class="why">
+						<strong>なぜヘッダーの文字色を分けるのか:</strong>
+						濃い地の上の文字色を本文用のグレーと共用すると、<strong>片方を調整したときにもう片方が壊れる</strong>。
+						用途が違う色は最初から別のトークンにしておく。
+					</div>
+				</section>
+
+				<!-- ============ 文字 ============ -->
+				<section id="type">
+					<h2>文字</h2>
+					<p>本文 17px / 行間 1.9 / 字送り 0.02em を基準にしています。</p>
+
+					<h3>フォントスタック</h3>
+					<div class="demo">
+						<div class="demo-label">FONT-FAMILY</div>
+						<div class="demo-body">
+							<code
+								>var(--font-atkinson), 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic
+								Medium', 'Yu Gothic', Meiryo, 'Noto Sans JP', sans-serif</code
+							>
+						</div>
+					</div>
+					<div class="why">
+						<strong>なぜ Web フォントを使わないのか:</strong>
+						欧文は雛形付属の Atkinson、和文は OS 同梱のゴシックへ落とす。
+						Atkinson は<strong>日本語グリフを持たない</strong>ため、フォールバックが無いと豆腐（□）になる。
+						和文 Web フォントを配信する案もあるが、CJK はサブセットが桁違いに大きく、
+						<code>subsets</code> に <code>japanese</code> を明示しないと<strong>かえって表示できない</strong>。
+						読みやすさの改善に見合わないため採用していない。
+					</div>
+
+					<h3>スケール</h3>
+					<div class="demo">
+						<div class="demo-label">TYPE SCALE</div>
+						<div class="demo-body">
+							<div class="type-row">
+								<div class="type-meta">h1 / 1.95rem</div>
+								<div class="t-h1">見出しの大きさ</div>
+							</div>
+							<div class="type-row">
+								<div class="type-meta">h2 / 1.4rem</div>
+								<div class="t-h2">見出しの大きさ</div>
+							</div>
+							<div class="type-row">
+								<div class="type-meta">h3 / 1.15rem</div>
+								<div class="t-h3">見出しの大きさ</div>
+							</div>
+							<div class="type-row">
+								<div class="type-meta">h4 / 1.02rem</div>
+								<div class="t-h4">見出しの大きさ</div>
+							</div>
+							<div class="type-row">
+								<div class="type-meta">body / 17px</div>
+								<div class="t-body">本文の大きさ。行間 1.9、字送り 0.02em。</div>
+							</div>
+						</div>
+					</div>
+
+					<table>
+						<thead>
+							<tr>
+								<th>項目</th>
+								<th>雛形</th>
+								<th>現在</th>
+								<th>理由</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>本文</td>
+								<td>20px</td>
+								<td>17px</td>
+								<td>20px は和文だと大きすぎ、一行の情報量が落ちる</td>
+							</tr>
+							<tr>
+								<td>行間</td>
+								<td>1.7</td>
+								<td>1.9</td>
+								<td>和文は字面が詰まるので圧迫感が出る</td>
+							</tr>
+							<tr>
+								<td>h1</td>
+								<td>3.052em（61px）</td>
+								<td>1.95rem</td>
+								<td>大きいだけでは階層が読み取れない</td>
+							</tr>
+							<tr>
+								<td>見出しの行間</td>
+								<td>1.2</td>
+								<td>1.5</td>
+								<td>1.2 だと日本語は行が重なって見える</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+
+				<!-- ============ レイアウト ============ -->
+				<section id="layout">
+					<h2>レイアウト</h2>
+					<p>列幅は <code>--measure</code> ひとつで制御しています。</p>
+
+					<div class="demo">
+						<div class="demo-label">MEASURE</div>
+						<div class="demo-body">
+							<div class="measure-demo">
+								<div class="measure-bar w-44"><span>--measure: 44rem（記事本文・固定ページ）</span></div>
+								<div class="measure-bar w-64"><span>html.wide → 64rem（トップ・記事一覧）</span></div>
+							</div>
+						</div>
+					</div>
+					<div class="why">
+						<strong>なぜ変数ひとつで切り替えるのか:</strong>
+						ヘッダー・パンくず・フッターも同じ <code>--measure</code> を見ている。
+						<code>html</code> に <code>.wide</code> を付けるだけで<strong>全部が同時に追従する</strong>ので、
+						ページごとに幅がずれることがない。
+					</div>
+
+					<table>
+						<thead>
+							<tr>
+								<th>トークン</th>
+								<th>値</th>
+								<th>用途</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><code>--measure</code></td>
+								<td>44rem</td>
+								<td>読み物の幅。記事・Profile・Career・404</td>
+							</tr>
+							<tr>
+								<td><code>html.wide</code></td>
+								<td>64rem</td>
+								<td>カードを3列並べる一覧ページ</td>
+							</tr>
+							<tr>
+								<td><code>--radius</code></td>
+								<td>8px</td>
+								<td>カード・画像・コードブロック・囲み</td>
+							</tr>
+							<tr>
+								<td><code>--header-h</code></td>
+								<td>実測値</td>
+								<td>sticky ヘッダーの高さ。目次の追従位置とアンカーの逃がし量が依存する</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<h3>記事ページの2カラム</h3>
+					<p>
+						見出しが2つ以上ある記事だけ、<code>240px / 1fr</code> の2カラムにして左に目次を置きます。
+						960px 未満では目次が本文の上に戻ります。
+					</p>
+					<div class="why">
+						<strong>なぜ条件付きなのか:</strong>
+						Profile / Career のように見出しを持たないページで<strong>空のサイドバーが開く</strong>のを避けるため。
+						判定は <code>BlogPost.astro</code> の <code>hasToc</code> と
+						<code>TableOfContents.astro</code> のフィルタで<strong>二重に持っている</strong>ので、
+						条件を変えるときは両方直すこと。
+					</div>
+
+					<h3>ヘッダーの高さは実測する</h3>
+					<p>
+						<code>--header-h</code> に CSS の初期値を置きつつ、<code>Header.astro</code> が
+						自分の <code>offsetHeight</code> を測って上書きします。<code>ResizeObserver</code> で
+						幅の変化にも追従します。
+					</p>
+					<div class="why">
+						<strong>なぜ実測なのか:</strong>
+						目次の <code>top</code>、見出しの <code>scroll-margin-top</code>、現在地判定の
+						オフセットの3つが、すべてヘッダーの高さに依存している。数値で書いておくと、
+						<strong>段数やパディングを変えた瞬間に3箇所が同時にずれる</strong>。
+						実際、ヘッダーを2段にしたときにこれが起きた。高さの出どころをヘッダー自身ひとつに絞り、
+						依存する側は変数を見るだけにしている。
+					</div>
+				</section>
+
+				<!-- ============ コンポーネント ============ -->
+				<section id="components">
+					<h2>コンポーネント</h2>
+					<p>実物の見た目と、そのかたちにした理由。</p>
+
+					<h3>グローバルヘッダー</h3>
+					<div class="demo">
+						<div class="demo-label">HEADER — sticky / --navy / 2段</div>
+						<div class="demo-header">
+							<span class="brand">Teru's Home</span>
+							<span class="demo-search">
+								<span class="ph">記事を検索</span>
+								<span class="mag" aria-hidden="true">&#9906;</span>
+							</span>
+						</div>
+						<div class="demo-header-nav">
+							<nav>
+								<span>Home</span>
+								<span>Profile</span>
+								<span>Career</span>
+								<span class="active">Blog</span>
+							</nav>
+						</div>
+					</div>
+					<p>
+						1段目にサイト名と検索窓、2段目にメニュー。現在地は太字と不透明度だけで示します。
+						下線は本文のリンクと紛らわしいため使いません。
+					</p>
+					<div class="why">
+						<strong>2段の区切りについて:</strong>
+						2段目は白 12% の細い罫線で分けるだけにしている。別の色を敷くと、
+						ひとつのヘッダーではなく<strong>帯が二つ並んでいるように見える</strong>。
+						<br /><br />
+						<strong>濃い地に載る文字色を専用トークンにしている理由:</strong>
+						サイト名も検索窓の文字もネイビーの上に載るので、本文用のグレーとは別に
+						<code>--header-fg</code> / <code>--header-fg-muted</code> を持つ。
+						共用すると片方の調整でもう片方が壊れる。
+					</div>
+
+					<h3>検索</h3>
+					<p>
+						静的サイトなのでサーバー側では絞り込めません。ビルド時に
+						<code>/search-index.json</code> を書き出し、<code>/search</code> がそれを読んで
+						ブラウザ側で絞り込みます。
+					</p>
+					<table>
+						<thead>
+							<tr>
+								<th>決めごと</th>
+								<th>内容</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>検索窓</td>
+								<td>
+									素の <code>form method="get"</code>。JS が無くても
+									<code>/search?q=</code> に飛ぶ
+								</td>
+							</tr>
+							<tr>
+								<td>索引の対象</td>
+								<td>タイトル・説明・タグ・本文。本文は1記事 4000 字で打ち切る</td>
+							</tr>
+							<tr>
+								<td>索引から外すもの</td>
+								<td>コードブロック。記号だらけでノイズになる</td>
+							</tr>
+							<tr>
+								<td>絞り込み</td>
+								<td>空白区切りの AND。日本語は単語で切れないので単純な部分一致</td>
+							</tr>
+							<tr>
+								<td>検索結果ページ</td>
+								<td><code>noindex</code></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<h3>パンくず</h3>
+					<div class="demo">
+						<div class="demo-label">BREADCRUMBS</div>
+						<div class="demo-body">
+							<div class="demo-crumbs">
+								<a href="#">Home</a><span class="sep">&gt;</span><a href="#">Blog</a
+								><span class="sep">&gt;</span
+								><span class="current">Next.js 16 の Middleware でルート保護を実装してみた</span>
+							</div>
+						</div>
+					</div>
+					<div class="why">
+						<strong>なぜ帯にしないのか:</strong>
+						背景を敷くと、それ自体がひとつの領域として主張してしまう。パンくずは補助情報なので、
+						本文と同じ列に文字だけ置く。区切りの <code>&gt;</code> は CSS の
+						<code>::before</code> で入れており、<strong>読み上げには拾われない</strong>。
+						経路は URL から機械的に組み立てるため、ページを増やしても付け忘れが起きない。
+					</div>
+
+					<h3>記事カード</h3>
+					<div class="demo">
+						<div class="demo-label">POST CARD</div>
+						<div class="demo-body">
+							<ul class="demo-cards">
+								<li>
+									<div class="card">
+										<div class="thumb"></div>
+										<div class="card-body">
+											<div class="meta">2026年8月30日</div>
+											<h4>Next.js 16 + Supabase のローカル環境で Google ログインを実装してハマった4点</h4>
+											<p class="excerpt">
+												タスク管理アプリを作るにあたって、まず認証だけを独立して完成させたかったのです。
+											</p>
+											<div class="card-foot">
+												<ul class="tags compact">
+													<li>Next.js</li>
+													<li>Supabase</li>
+													<li>認証</li>
+												</ul>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="card">
+										<div class="thumb"></div>
+										<div class="card-body">
+											<div class="meta">2026年8月31日</div>
+											<h4>短いタイトルの記事</h4>
+											<p class="excerpt">抜粋が短くても、タグは常にカードの下端に揃います。</p>
+											<div class="card-foot">
+												<ul class="tags compact">
+													<li>Middleware</li>
+												</ul>
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="why">
+						<strong>決めごとが4つ:</strong>
+						<br />① 列数は固定せず <code>auto-fill</code> + <code>minmax(17rem, 1fr)</code> に任せる。
+						固定すると記事が1〜2本の時期に空の枠ができる。
+						<br />② <strong>サムネイル領域は画像が無くても必ず確保する。</strong>
+						有る記事と無い記事が混ざると、カードごとに日付とタイトルの高さがずれてグリッドが不揃いに見える。
+						画像が無い場合は淡いグラデーションを敷く。
+						<br />③ 抜粋は3行で打ち切り、タグは <code>margin-top: auto</code> で下端に固定。行内で高さが揃う。
+						<br />④ カード全体をリンクにする。タイトルだけだとクリック先が狭い。
+					</div>
+
+					<h3>タグ</h3>
+					<div class="demo">
+						<div class="demo-label">TAGS</div>
+						<div class="demo-body">
+							<ul class="tags">
+								<li>Next.js</li>
+								<li>Supabase</li>
+								<li>認証</li>
+								<li>Docker</li>
+							</ul>
+						</div>
+					</div>
+					<div class="why">
+						<strong>なぜ flex で中央寄せしないのか:</strong>
+						置き場所ごとに揃え方が違う（一覧は左、記事の見出し周りは中央だった時期もある）。
+						<code>li</code> を <code>inline-block</code> にして<strong>親の <code>text-align</code> に追従</strong>させれば、
+						どこに置いても崩れない。なお余白は右にだけ置く。左右に置いて負のマージンで打ち消すと、
+						その負のマージンが親からはみ出して<strong>横スクロールの原因になる</strong>。
+					</div>
+
+					<h3>目次（サイドナビ）</h3>
+					<div class="demo">
+						<div class="demo-label">TABLE OF CONTENTS — 3番目が現在地</div>
+						<div class="demo-body">
+							<div class="demo-toc">
+								<p class="toc-title">目次</p>
+								<ol>
+									<li><a href="#">3行まとめ</a></li>
+									<li><a href="#">やってみる</a></li>
+									<li class="depth-3"><a class="is-current" href="#">3. config.toml を設定する</a></li>
+									<li class="depth-3"><a href="#">4. クライアントを3つ作る</a></li>
+									<li><a href="#">詰まったところ</a></li>
+									<li><a href="#">まとめ</a></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<th>状態</th>
+								<th>見た目</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>通常（h2）</td>
+								<td><code>--gray-dark</code> / 0.85rem</td>
+							</tr>
+							<tr>
+								<td>通常（h3）</td>
+								<td><code>--gray</code> / 0.8rem / 字下げ 1.7rem</td>
+							</tr>
+							<tr>
+								<td>現在地</td>
+								<td>文字 <code>--accent-light</code> / 背景 <code>--accent-soft</code> / 左に2pxの縦棒 / 太字</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="why">
+						<strong>現在地の判定について:</strong>
+						<code>IntersectionObserver</code> ではなく、スクロールから毎回計算している。
+						<strong>節が画面より長いとどの見出しも交差しない瞬間が生まれ</strong>、observer だけでは現在地が消えるため。
+						「判定線（上から110px）より上にある見出しのうち最後のもの」を選べば隙間でも途切れない。
+						最下部では最後の節を現在地にする（短い節は判定線に届かないため）。
+						<br /><br />
+						縦棒の場所は<strong>透明で確保しておく</strong>。印が付いた瞬間に文字がずれるのを防ぐため。
+						見出しには <code>scroll-margin-top: 5rem</code> を入れる。sticky ヘッダーの下に飛び先が潜ると、
+						どこに飛んだか分からなくなる。
+					</div>
+
+					<h3>作成中の箱</h3>
+					<div class="demo">
+						<div class="demo-label">WIP NOTICE</div>
+						<div class="demo-body">
+							<p class="wip">作成中です。</p>
+						</div>
+					</div>
+					<p>
+						中身を書いたら <code>WipNotice</code> ごと消します。ページ自体は先に用意しておきます。
+						メニューのリンクが 404 になるのを避けるためです。
+					</p>
+				</section>
+
+				<!-- ============ 動き ============ -->
+				<section id="motion">
+					<h2>動き</h2>
+					<p>トップページのアイキャッチと、読書中の補助だけ。装飾のための動きは置きません。</p>
+
+					<h3>共通の決まり</h3>
+					<ul>
+						<li>
+							<code>prefers-reduced-motion: reduce</code> の人には<strong>完成した状態</strong>を出す。
+							アニメーションを止めるだけだと初期値（<code>scaleY(0)</code> /
+							<code>opacity: 0</code>）で固まり、線も丸も消える
+						</li>
+						<li>外部のアニメーションライブラリは足さない</li>
+						<li>動いている間にレイアウトがずれない。高さは先に確保する</li>
+						<li>本文は最初から HTML に入れる。JS で組み立てると、動かない環境で中身が消える</li>
+					</ul>
+
+					<h3>ターミナル（トップの導入）</h3>
+					<p>
+						<code>$ cat README.md</code> が打ち込まれ、ひと呼吸おいて中身が出ます。
+						打鍵の間隔は 45〜100ms でばらつかせています。等間隔だと機械的に見えるためです。
+					</p>
+					<div class="why">
+						<strong>コマンドを <code>cat README.md</code> にした理由:</strong>
+						出力が「H1 + 説明文」という形になり、<code>&lt;h1&gt;</code> をそのまま出力行として
+						使える。<code>whoami</code> だとサイト名が出るのが不自然になる。
+						<br /><br />
+						<strong>打ち始める前に高さを固定している:</strong>
+						打つにつれて背が伸びると、下のコミットグラフが押し下げられて画面が揺れる。
+						代償として打っている 1.5 秒ほどは枠内に空白ができるが、揺れないほうを選んだ。
+						隠すのに <code>display: none</code> ではなく <code>visibility: hidden</code> を
+						使うのも、高さを失わないため。
+					</div>
+
+					<h3>コミットグラフ（トップの記事一覧）</h3>
+					<p>
+						記事をコミットに見立てて縦のブランチ線に並べます。線が 0.9 秒かけて上から伸び、
+						それを追いかけて丸が 0.16 秒ずつずれて灯ります。
+					</p>
+					<div class="why">
+						<strong>作り話の情報は足さない:</strong>
+						コミットハッシュ風の文字列を並べればそれらしくなるが、
+						<strong>実在しない値を本物に見える形で出す</strong>ことになる。
+						線・丸・ブランチ名（実際に <code>main</code> で運用している）だけで見立てを作る。
+						<br /><br />
+						<strong>丸はグリッドの1列目に置く:</strong>
+						絶対配置にすると基準の箱が行ごとに変わり、線と丸の中心が噛み合わない。
+						同じ列に入れておけばずれようがない。実装中に2回ずらしてから、この形に落ち着いた。
+					</div>
+
+					<h3>目次の現在地</h3>
+					<p>
+						スクロール位置に応じて、いま読んでいる節を水色で示します。
+						見本と判定のしくみは<a href="#components">コンポーネント</a>の節にあります。
+					</p>
+
+					<h3>トップの構成について</h3>
+					<p>
+						トップは「ターミナル（入口の挨拶）」→「コミットグラフ（積み上がってきたもの）」の順。
+						記事一覧ページ（<code>/blog</code>）はカードのままで、
+						<strong>トップと一覧で見せ方が違います</strong>。意図的な非対称です。
+						トップは眺めるところ、一覧は探すところ、と役割が違うため。
+					</p>
+				</section>
+
+				<!-- ============ 運用の決まり ============ -->
+				<section id="rules">
+					<h2>運用の決まり</h2>
+					<p>次に手を入れる人（＝将来の自分）向け。</p>
+
+					<h3>守ること</h3>
+					<ul>
+						<li>色は必ずトークン経由で使う。コンポーネントに直値を書かない</li>
+						<li>用途が違う色はトークンを分ける。リンクの青と「いまここ」の水色を共用しない</li>
+						<li>記事本文の列幅 <code>44rem</code> は広げない</li>
+						<li>負のマージンで余白を打ち消さない。横スクロールの原因になる</li>
+						<li>横に溢れうるもの（表・コードブロック）は、ページではなく自分の中でスクロールさせる</li>
+						<li>
+							枠線を持つ丸や箱には <code>box-sizing: border-box</code> を明示する。
+							このプロジェクトにグローバルな <code>border-box</code> 指定は無く、
+							既定の <code>content-box</code> のままだと中心の計算に枠線ぶんが乗らない
+						</li>
+						<li>
+							JS が <code>innerHTML</code> で作った要素に、Astro のスコープ付き CSS は当たらない。
+							スコープ用の属性が付かないため。<code>:global()</code> で抜ける
+						</li>
+					</ul>
+
+					<h3>二重に持っている値</h3>
+					<p>片方だけ直すとずれるので、対で直します。</p>
+					<table>
+						<thead>
+							<tr>
+								<th>値</th>
+								<th>場所</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>目次を出す条件（h2/h3 が2つ以上）</td>
+								<td><code>TableOfContents.astro</code> と <code>BlogPost.astro</code> の <code>hasToc</code></td>
+							</tr>
+							<tr>
+								<td><s>sticky ヘッダーの高さを見込んだ余白</s></td>
+								<td>
+									<strong>解消済み。</strong>3箇所に散っていたが、<code>Header.astro</code> が
+									実測して <code>--header-h</code> に流す形にした。依存する側は変数を見るだけ
+								</td>
+							</tr>
+							<tr>
+								<td>トップの説明文</td>
+								<td>
+									<code>consts.ts</code> の <code>SITE_DESCRIPTION</code>（メタタグ用）と
+									<code>TerminalIntro.astro</code> の本文。似た文面を別々に持っている
+								</td>
+							</tr>
+							<tr>
+								<td>このガイドの色と文字の値</td>
+								<td>このファイルと <code>src/styles/global.css</code></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<h3>まだ決めていないこと</h3>
+					<ul>
+						<li>ダークモード。トークンで組んであるので追加はしやすい</li>
+						<li>タグ別の一覧ページ。いまタグは表示だけでリンクではない</li>
+						<li>OGP 画像。既定値が Astro のプレースホルダ画像のまま</li>
+						<li>ファビコンが Astro の既定のまま。タブに出るのは Astro のロゴ</li>
+						<li>
+							トップにターミナルとコミットグラフの両方を置いている。情報量が増え、
+							静かなデザインからは一歩離れた。片方に絞る余地はある
+						</li>
+						<li>
+							グローバルな <code>box-sizing: border-box</code>。入れるべきだが、
+							既に組んだカード・検索窓・目次の寸法が一斉に変わるので、
+							各所を再確認する前提の別作業にする
+						</li>
+					</ul>
+				</section>
+			</main>
+		</div>
+
+		<footer class="doc-foot">
+			このガイドは手で書き写したもので、CSS とは自動同期しません。トークンを変えたら
+			<code>src/styles/global.css</code> とこのファイルの両方を直してください。
+		</footer>
+	</body>
+</html>

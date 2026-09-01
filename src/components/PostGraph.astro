@@ -1,0 +1,209 @@
+---
+import FormattedDate from './FormattedDate.astro';
+import Tags from './Tags.astro';
+import type { Post } from '../lib/posts';
+
+interface Props {
+	posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+{
+	posts.length > 0 && (
+		<div class="graph">
+			<p class="branch">
+				<span class="node" aria-hidden="true" />
+				<span class="branch-name">main</span>
+			</p>
+
+			<ol class="commits">
+				{posts.map((post, i) => (
+					<li style={`--i:${i}`}>
+						<span class="dot" aria-hidden="true" />
+						<a href={`/blog/${post.id}/`}>
+							<span class="meta">
+								<FormattedDate date={post.data.pubDate} />
+								{post.data.draft && <span class="draft">下書き</span>}
+							</span>
+							<span class="title">{post.data.title}</span>
+							{post.data.description && <span class="excerpt">{post.data.description}</span>}
+							<Tags tags={post.data.tags} compact />
+						</a>
+					</li>
+				))}
+			</ol>
+		</div>
+	)
+}
+
+<style>
+	/*
+	  記事をコミットに見立てて縦のブランチ線に並べる。線が上から伸び、
+	  丸が順に灯る。記事が増えるほど絵として育つのを狙っている。
+
+	  作り話の情報は足していない。コミットハッシュ風の文字列を並べれば
+	  それらしくはなるが、実在しない値を本物に見える形で出すことになるため。
+	  線・丸・ブランチ名（実際に main で運用している）だけで見立てを作る。
+
+	  丸は絶対配置ではなくグリッドの1列目に置いている。絶対配置だと基準の箱が
+	  行ごとに変わり、線と丸の中心が噛み合わなくなるため。同じ列に入れておけば
+	  ずれようがない。
+	*/
+	.graph {
+		--rail-col: 1.2rem; /* 線と丸が入る列の幅 */
+		--gap: 1rem; /* 列と本文の間 */
+		--dot: 0.85rem;
+
+		position: relative;
+	}
+
+	/* ブランチ線。main のラベルから最後のコミットまで1本で通す */
+	.graph::before {
+		content: '';
+		position: absolute;
+		top: 0.5rem;
+		bottom: 0;
+		left: calc(var(--rail-col) / 2 - 1px);
+		width: 2px;
+		background: rgb(var(--gray-light));
+		transform: scaleY(0);
+		transform-origin: top;
+		animation: draw-rail 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+	}
+
+	.branch,
+	.commits li {
+		display: grid;
+		grid-template-columns: var(--rail-col) minmax(0, 1fr);
+		column-gap: var(--gap);
+		align-items: start;
+	}
+
+	.branch {
+		margin: 0 0 1.3rem;
+	}
+	.branch-name {
+		color: rgb(var(--gray));
+		font-size: 0.78rem;
+		letter-spacing: 0.08em;
+	}
+	.node {
+		justify-self: center;
+		width: 0.5rem;
+		height: 0.5rem;
+		margin-top: 0.3rem;
+		border-radius: 999px;
+		background: rgb(var(--gray-light));
+	}
+
+	.commits {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.commits li {
+		margin: 0;
+		padding: 0 0 1.8rem;
+	}
+	.commits li:last-child {
+		padding-bottom: 0;
+	}
+	.commits a {
+		display: block;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	/* コミットの丸。線の上に重ねるので地色で塗り、線を隠して節に見せる */
+	.dot {
+		justify-self: center;
+		/*
+		  枠線を持つので border-box にする。既定の content-box のままだと
+		  中心の計算に枠線ぶんが乗らず、線から 2px ずれる。
+		*/
+		box-sizing: border-box;
+		width: var(--dot);
+		height: var(--dot);
+		margin-top: 0.32rem;
+		border: 2px solid rgb(var(--gray));
+		border-radius: 999px;
+		background: var(--bg);
+		opacity: 0;
+		transform: scale(0.3);
+		animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+		/* 線が伸びるのを追いかけるように、上の記事から順に灯す */
+		animation-delay: calc(0.3s + var(--i) * 0.16s);
+		transition:
+			border-color 0.15s ease,
+			background 0.15s ease;
+	}
+	/* 丸はリンクの外にあるので、行全体のホバーで拾う */
+	.commits li:hover .dot {
+		border-color: var(--accent-light);
+		background: var(--accent-light);
+	}
+
+	.meta {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		color: rgb(var(--gray));
+		font-size: 0.78rem;
+		line-height: 1.6;
+	}
+	/* dev でしか出ない。本番ビルドでは draft の記事自体が除外される */
+	.draft {
+		padding: 0.05em 0.5em;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 4px;
+		background: var(--bg-subtle);
+	}
+	.title {
+		display: block;
+		margin: 0.2rem 0 0.35rem;
+		color: rgb(var(--black));
+		font-size: 1.05rem;
+		font-weight: 700;
+		line-height: 1.6;
+	}
+	.commits li:hover .title {
+		color: var(--accent);
+	}
+	.excerpt {
+		display: block;
+		color: rgb(var(--gray));
+		font-size: 0.88rem;
+		line-height: 1.8;
+	}
+
+	@keyframes draw-rail {
+		to {
+			transform: scaleY(1);
+		}
+	}
+	@keyframes pop {
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	/*
+	  動きを減らす設定の人には、完成した状態をそのまま出す。
+	  アニメーションを消すだけだと初期値（scaleY(0) / opacity:0）で
+	  止まり、線も丸も消えてしまう。
+	*/
+	@media (prefers-reduced-motion: reduce) {
+		.graph::before {
+			animation: none;
+			transform: scaleY(1);
+		}
+		.dot {
+			animation: none;
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+</style>

@@ -1,0 +1,158 @@
+---
+import { Image } from 'astro:assets';
+import FormattedDate from './FormattedDate.astro';
+import Tags from './Tags.astro';
+import type { Post } from '../lib/posts';
+
+interface Props {
+	posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+{
+	posts.length === 0 ? (
+		<p class="empty">まだ記事がありません。</p>
+	) : (
+		<ul class="posts">
+			{posts.map((post) => (
+				<li>
+					<a class="card" href={`/blog/${post.id}/`}>
+						<div class="thumb">
+							{post.data.heroImage ? (
+								<Image width={640} height={360} src={post.data.heroImage} alt="" />
+							) : (
+								<span class="thumb-fallback" aria-hidden="true" />
+							)}
+						</div>
+						<div class="body">
+							<div class="meta">
+								<FormattedDate date={post.data.pubDate} />
+								{post.data.draft && <span class="draft">下書き</span>}
+							</div>
+							<h3>{post.data.title}</h3>
+							{post.data.description && <p class="excerpt">{post.data.description}</p>}
+							<div class="foot">
+								<Tags tags={post.data.tags} compact />
+							</div>
+						</div>
+					</a>
+				</li>
+			))}
+		</ul>
+	)
+}
+
+<style>
+	/*
+	  auto-fill + minmax にしているので、列数は幅任せ。広い画面で3列、
+	  タブレットで2列、スマホで1列に落ちる。列数を固定すると、
+	  記事が1〜2本しかない時期に空の隙間ができる。
+	*/
+	.posts {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+		gap: 1.5rem;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.posts li {
+		margin: 0;
+	}
+
+	/* カード全体をリンクにする。タイトルだけだとクリック先が狭くて押しにくい */
+	.card {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: var(--radius);
+		background: var(--bg);
+		color: inherit;
+		text-decoration: none;
+		overflow: hidden;
+		transition:
+			border-color 0.15s ease,
+			transform 0.15s ease;
+	}
+	.card:hover {
+		border-color: rgb(var(--gray));
+		transform: translateY(-2px);
+	}
+
+	/*
+	  heroImage が無い記事でもサムネイル領域は必ず確保する。
+	  有る記事と無い記事が混ざると、カードごとに日付とタイトルの高さがずれて
+	  グリッドが不揃いに見えるため。
+	*/
+	.thumb {
+		aspect-ratio: 16 / 9;
+		background: var(--bg-subtle);
+	}
+	.thumb :global(img) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		border-radius: 0;
+	}
+	.thumb-fallback {
+		display: block;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(135deg, rgba(47, 93, 158, 0.09), rgba(47, 93, 158, 0.02) 60%);
+	}
+
+	.body {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		padding: 1.1rem 1.2rem 1.2rem;
+	}
+	.meta {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		color: rgb(var(--gray));
+		font-size: 0.78rem;
+		line-height: 1.6;
+	}
+	/* dev でしか出ない。本番ビルドでは draft の記事自体が除外される */
+	.draft {
+		padding: 0.05em 0.5em;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 4px;
+		background: var(--bg-subtle);
+	}
+	.card h3 {
+		margin: 0.35rem 0 0.5rem;
+		font-size: 1.02rem;
+		line-height: 1.6;
+	}
+	.card:hover h3 {
+		color: var(--accent);
+	}
+	.excerpt {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.85rem;
+		line-height: 1.8;
+
+		/* 抜粋の長さでカード丈がばらつかないよう3行で打ち切る */
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		overflow: hidden;
+	}
+	/* タグは常にカードの底に貼り付けて、行内で高さを揃える */
+	.foot {
+		margin-top: auto;
+		padding-top: 0.8rem;
+	}
+	.empty {
+		color: rgb(var(--gray));
+	}
+</style>

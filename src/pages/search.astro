@@ -1,0 +1,190 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead title="検索" description={`${SITE_TITLE} の記事を検索する`} />
+		<!-- 検索結果はインデックス不要 -->
+		<meta name="robots" content="noindex" />
+	</head>
+	<body>
+		<Header />
+		<Breadcrumbs current="検索" />
+		<main>
+			<h1>検索</h1>
+			<p class="status" data-status>読み込み中…</p>
+			<ol class="results" data-results></ol>
+		</main>
+		<Footer />
+
+		<script>
+			/**
+			 * 静的サイトなのでサーバー側では絞り込めない。ビルド時に書き出した
+			 * /search-index.json を読んで、ブラウザ側で絞り込む。
+			 */
+			type Entry = {
+				id: string;
+				title: string;
+				description: string;
+				tags: string[];
+				pubDate: string;
+				text: string;
+			};
+
+			const statusEl = document.querySelector<HTMLElement>('[data-status]');
+			const resultsEl = document.querySelector<HTMLOListElement>('[data-results]');
+			const query = (new URLSearchParams(location.search).get('q') ?? '').trim();
+
+			const dateFormat = new Intl.DateTimeFormat('ja-JP', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+			});
+
+			function escapeHtml(value: string) {
+				return value.replace(
+					/[&<>"']/g,
+					(c) =>
+						({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] ?? c,
+				);
+			}
+
+			function render(entries: Entry[]) {
+				if (!resultsEl) return;
+				resultsEl.innerHTML = entries
+					.map((entry) => {
+						const tags = entry.tags
+							.map((tag) => `<li>${escapeHtml(tag)}</li>`)
+							.join('');
+						return `
+							<li>
+								<a href="/blog/${encodeURIComponent(entry.id)}/">
+									<span class="date">${dateFormat.format(new Date(entry.pubDate))}</span>
+									<span class="title">${escapeHtml(entry.title)}</span>
+									${entry.description ? `<span class="excerpt">${escapeHtml(entry.description)}</span>` : ''}
+									${tags ? `<ul class="tags">${tags}</ul>` : ''}
+								</a>
+							</li>`;
+					})
+					.join('');
+			}
+
+			async function run() {
+				if (!statusEl) return;
+
+				if (query === '') {
+					statusEl.textContent = '上の検索窓に語を入れてください。';
+					return;
+				}
+
+				let index: Entry[];
+				try {
+					const response = await fetch('/search-index.json');
+					if (!response.ok) throw new Error(String(response.status));
+					index = await response.json();
+				} catch {
+					statusEl.textContent = '検索用のデータを読み込めませんでした。';
+					return;
+				}
+
+				// 空白区切りの語をすべて含むものを拾う（AND 検索）。
+				// 日本語は単語で切れないので、単純な部分一致にしている。
+				const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+				const hits = index.filter((entry) => {
+					const haystack =
+						`${entry.title} ${entry.description} ${entry.tags.join(' ')} ${entry.text}`.toLowerCase();
+					return terms.every((term) => haystack.includes(term));
+				});
+
+				statusEl.textContent =
+					hits.length === 0
+						? `「${query}」に一致する記事はありませんでした。`
+						: `「${query}」の検索結果 ${hits.length} 件`;
+				render(hits);
+			}
+
+			run();
+		</script>
+
+		<style>
+			/*
+			  結果は JS が innerHTML で作るため、Astro のスコープ用属性が付かない。
+			  スコープ付きのセレクタのままだと一切当たらないので、
+			  .results（テンプレート側の要素）を起点に :global で子孫へ抜ける。
+			*/
+			.status {
+				margin: 0 0 2rem;
+				color: rgb(var(--gray));
+				font-size: 0.92rem;
+			}
+			.results {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.results :global(li) {
+				margin: 0;
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+			.results :global(li:first-child) {
+				border-top: 1px solid rgb(var(--gray-light));
+			}
+			.results :global(a) {
+				display: block;
+				padding: 1.3rem 0.6rem;
+				color: inherit;
+				text-decoration: none;
+			}
+			.results :global(a:hover) {
+				background: var(--bg-subtle);
+			}
+			.results :global(.date) {
+				display: block;
+				color: rgb(var(--gray));
+				font-size: 0.78rem;
+				line-height: 1.6;
+			}
+			.results :global(.title) {
+				display: block;
+				margin: 0.2rem 0 0.35rem;
+				color: rgb(var(--black));
+				font-size: 1.05rem;
+				font-weight: 700;
+				line-height: 1.6;
+			}
+			.results :global(a:hover .title) {
+				color: var(--accent);
+			}
+			.results :global(.excerpt) {
+				display: block;
+				color: rgb(var(--gray));
+				font-size: 0.88rem;
+				line-height: 1.8;
+			}
+			.results :global(.tags) {
+				margin: 0.6em 0 0;
+				padding: 0;
+				list-style: none;
+			}
+			/* タグの li は結果の li と別物なので、罫線を打ち消しておく */
+			.results :global(.tags li) {
+				display: inline-block;
+				margin: 0.2em 0.4em 0.2em 0;
+				padding: 0.1em 0.6em;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 999px;
+				background: rgba(var(--gray-light), 35%);
+				color: rgb(var(--gray));
+				font-size: 0.7rem;
+				line-height: 1.6;
+				white-space: nowrap;
+			}
+		</style>
+	</body>
+</html>

@@ -30,13 +30,15 @@ const { tags = [], compact = false } = Astro.props;
 	  li を inline-block にしておけば、親の指定にそのまま追従する。
 	*/
 	.tags {
-		margin: 0.6em -0.2em 0;
+		margin: 0.6em 0 0;
 		padding: 0;
 		list-style: none;
 	}
 	.tags li {
 		display: inline-block;
-		margin: 0.2em;
+		/* 右にだけ余白を置く。左右に置くと負のマージンで打ち消す必要が出て、
+		   その負のマージンが親からはみ出して横スクロールの原因になる */
+		margin: 0.2em 0.4em 0.2em 0;
 		padding: 0.15em 0.7em;
 		border: 1px solid rgb(var(--gray-light));
 		border-radius: 999px;

@@ -1,8 +1,16 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Header from '../components/Header.astro';
+import PostGraph from '../components/PostGraph.astro';
+import TerminalIntro from '../components/TerminalIntro.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getPublishedPosts } from '../lib/posts';
+
+const posts = await getPublishedPosts();
+const latest = posts.slice(0, 5);
+const hasMore = posts.length > latest.length;
 ---
 
 <!doctype html>
@@ -12,16 +20,52 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 	</head>
 	<body>
 		<Header />
+		<Breadcrumbs />
 		<main>
-			<h1>ようこそ</h1>
-			<p>
-				手を動かして学んだことを、そのまま記事にしていくブログです。
-				Next.js / Supabase / Claude Code まわりの検証ログが中心になる予定です。
-			</p>
-			<p>
-				記事の一覧は <a href="/blog">ブログ</a> から辿れます。
-			</p>
+			<section class="intro">
+				<TerminalIntro />
+			</section>
+
+			<section>
+				<h2 class="section-title">最近の記事</h2>
+				<PostGraph posts={latest} />
+				{
+					hasMore && (
+						<p class="more">
+							<a href="/blog">記事の一覧を見る →</a>
+						</p>
+					)
+				}
+			</section>
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+	/*
+	  トップは「自己紹介 + 最近の記事」にした。記事一覧と分けて置くと、
+	  記事が数本の段階ではトップに実質的な中身が無くなる。
+	*/
+	/* ターミナル自体が枠を持つので、区切りの罫線は重ねない */
+	.intro {
+		padding-bottom: 1rem;
+	}
+	.section-title {
+		margin: 2.5rem 0 1.5rem;
+		font-size: 0.85rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		color: rgb(var(--gray));
+	}
+	.more {
+		margin: 1.8rem 0 0;
+		font-size: 0.92rem;
+	}
+	.more a {
+		text-decoration: none;
+	}
+	.more a:hover {
+		text-decoration: underline;
+	}
+</style>

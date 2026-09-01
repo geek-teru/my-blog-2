@@ -1,0 +1,168 @@
+---
+import { SITE_TITLE } from '../consts';
+---
+
+<div class="term" data-term>
+	<div class="bar" aria-hidden="true">
+		<span class="dots"><i></i><i></i><i></i></span>
+		<span class="path">~/blog</span>
+	</div>
+
+	<div class="screen">
+		<p class="cmd"><span data-typed>cat README.md</span><span class="cursor" data-cursor></span></p>
+
+		<div class="out" data-out>
+			<h1>{SITE_TITLE}</h1>
+			<p>
+				手を動かして学んだことを、そのまま記事にしていくブログです。
+				Next.js / Supabase / Claude Code まわりの検証ログが中心です。
+			</p>
+		</div>
+	</div>
+</div>
+
+<script>
+	/**
+	 * ターミナル風のタイピング。
+	 *
+	 * 本文は最初から HTML に入れてある。JS で組み立てると、スクリプトが動かない
+	 * 環境でトップページが空になり、検索エンジンにも中身が渡らないため。
+	 * ここでやっているのは「いったん隠して、打ち直して見せる」だけ。
+	 */
+	function setupTerminal() {
+		const term = document.querySelector<HTMLElement>('[data-term]');
+		if (!term) return;
+
+		const typed = term.querySelector<HTMLElement>('[data-typed]');
+		const out = term.querySelector<HTMLElement>('[data-out]');
+		const cursor = term.querySelector<HTMLElement>('[data-cursor]');
+		if (!typed || !out || !cursor) return;
+
+		// 動きを減らす設定なら、完成した状態のまま何もしない
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			cursor.classList.add('blink');
+			return;
+		}
+
+		// 打ち始める前に高さを確保する。打つにつれて背が伸びると、
+		// 下にあるコミットグラフが押し下げられて画面が揺れる
+		const screen = term.querySelector<HTMLElement>('.screen');
+		if (screen) screen.style.minHeight = `${screen.offsetHeight}px`;
+
+		const command = typed.textContent ?? '';
+		typed.textContent = '';
+		out.classList.add('is-hidden');
+
+		let i = 0;
+		const step = () => {
+			typed.textContent = command.slice(0, ++i);
+			if (i < command.length) {
+				// 一定間隔だと機械的に見えるので、少しばらつかせる
+				setTimeout(step, 45 + Math.random() * 55);
+				return;
+			}
+			// 打ち終わってひと呼吸おいてから結果を出す
+			setTimeout(() => {
+				out.classList.remove('is-hidden');
+				cursor.classList.add('blink');
+			}, 320);
+		};
+		setTimeout(step, 400);
+	}
+
+	setupTerminal();
+</script>
+
+<style>
+	.term {
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: var(--radius);
+		overflow: hidden;
+		background: var(--bg);
+	}
+
+	/* 窓の上端。ネイビーにしてヘッダーと同じ世界のものに見せる */
+	.bar {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		padding: 0.55rem 0.9rem;
+		background: var(--navy);
+	}
+	.dots {
+		display: flex;
+		gap: 0.35rem;
+	}
+	.dots i {
+		width: 0.6rem;
+		height: 0.6rem;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.25);
+	}
+	.path {
+		color: var(--header-fg-muted);
+		font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+		font-size: 0.75rem;
+		letter-spacing: 0;
+	}
+
+	.screen {
+		padding: 1.3rem 1.4rem 1.6rem;
+	}
+
+	.cmd {
+		margin: 0;
+		color: rgb(var(--gray-dark));
+		font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+		font-size: 0.88rem;
+		line-height: 1.7;
+		letter-spacing: 0;
+	}
+	.cmd::before {
+		content: '$ ';
+		color: var(--accent-light);
+		font-weight: 700;
+	}
+
+	.cursor {
+		display: inline-block;
+		width: 0.5em;
+		height: 1em;
+		margin-left: 0.1em;
+		background: rgb(var(--gray));
+		vertical-align: -0.15em;
+	}
+	.cursor.blink {
+		animation: blink 1.05s steps(1, end) infinite;
+	}
+
+	.out {
+		margin-top: 0.9rem;
+	}
+	.out h1 {
+		margin: 0 0 0.5rem;
+	}
+	.out p {
+		margin: 0;
+		color: rgb(var(--gray));
+	}
+	/*
+	  visibility で消す。display: none だと高さが失われ、
+	  確保しておいた min-height の意味が無くなる
+	*/
+	.out.is-hidden {
+		visibility: hidden;
+	}
+
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
+	@media (max-width: 34rem) {
+		.screen {
+			padding: 1.1rem 1rem 1.3rem;
+		}
+	}
+</style>

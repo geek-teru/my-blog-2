@@ -12,13 +12,20 @@ const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 <a href={href} class:list={[className, { active: isActive }]} {...props}>
 	<slot />
 </a>
+
 <style>
+	/* ネイビー地に載るので、本文のリンク色ではなくヘッダー用の色を使う */
 	a {
 		display: inline-block;
+		color: var(--header-fg-muted);
 		text-decoration: none;
 	}
+	a:hover {
+		color: var(--header-fg);
+	}
+	/* 現在地は太字だけで示す。下線は本文のリンクと紛らわしい */
 	a.active {
-		font-weight: bolder;
-		text-decoration: underline;
+		color: var(--header-fg);
+		font-weight: 700;
 	}
 </style>
