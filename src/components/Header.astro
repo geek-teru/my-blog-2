@@ -1,19 +1,68 @@
 ---
 import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
+
+// 検索ページから来たときは入力欄に語を残しておく
+const q = Astro.url.searchParams.get('q') ?? '';
 ---
 
 <header>
-	<nav>
+	<div class="row top">
 		<a class="brand" href="/">{SITE_TITLE}</a>
-		<div class="links">
+
+		<form class="search" action="/search" method="get" role="search">
+			<label class="sr-only" for="site-search">記事を検索</label>
+			<input
+				id="site-search"
+				type="search"
+				name="q"
+				value={q}
+				placeholder="記事を検索"
+				autocomplete="off"
+			/>
+			<button type="submit">
+				<span class="sr-only">検索する</span>
+				<svg viewBox="0 0 20 20" aria-hidden="true" width="16" height="16">
+					<path
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						d="M8.5 15a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13zm4.8-1.7L18 18"></path>
+				</svg>
+			</button>
+		</form>
+	</div>
+
+	<div class="row nav">
+		<nav>
 			<HeaderLink href="/">Home</HeaderLink>
 			<HeaderLink href="/profile">Profile</HeaderLink>
 			<HeaderLink href="/career">Career</HeaderLink>
 			<HeaderLink href="/blog">Blog</HeaderLink>
-		</div>
-	</nav>
+		</nav>
+	</div>
 </header>
+
+<script>
+	/**
+	 * ヘッダーの実測値を --header-h に流し込む。
+	 *
+	 * 目次の追従位置とアンカーの逃がし量がこの高さに依存しており、
+	 * CSS 側に数値を書いておくと段数やパディングを変えた瞬間にずれる。
+	 * 高さの出どころをヘッダー自身ひとつに絞るための仕掛け。
+	 */
+	const header = document.querySelector('header');
+	if (header) {
+		const sync = () => {
+			document.documentElement.style.setProperty('--header-h', `${header.offsetHeight}px`);
+		};
+		sync();
+		// 折り返しで段数が変わるので、幅の変化にも追従させる
+		if ('ResizeObserver' in window) new ResizeObserver(sync).observe(header);
+		else window.addEventListener('resize', sync);
+	}
+</script>
 
 <style>
 	header {
@@ -22,7 +71,7 @@ import HeaderLink from './HeaderLink.astro';
 		z-index: 10;
 		background: var(--navy);
 	}
-	nav {
+	.row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -30,20 +79,90 @@ import HeaderLink from './HeaderLink.astro';
 		width: var(--measure);
 		max-width: calc(100% - 2.5rem);
 		margin: 0 auto;
-		padding: 0.9rem 0;
 	}
+	.top {
+		padding: 0.85rem 0;
+	}
+	/* 2段目は髪の毛一本ぶんの罫線で区切る。別の色を敷くと帯が二つに見える */
+	.nav {
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+	}
+	.nav nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.2rem 1.4rem;
+		padding: 0.5rem 0;
+		font-size: 0.9rem;
+	}
+
 	.brand {
 		color: var(--header-fg);
 		font-weight: 700;
-		font-size: 1rem;
+		font-size: 1.05rem;
 		letter-spacing: 0.01em;
 		text-decoration: none;
+		white-space: nowrap;
 	}
-	.links {
+
+	.search {
 		display: flex;
-		flex-wrap: wrap;
-		justify-content: flex-end;
-		gap: 0.5rem 1.1rem;
-		font-size: 0.9rem;
+		align-items: center;
+		gap: 0.3rem;
+		width: min(18rem, 45%);
+		padding: 0.25rem 0.3rem 0.25rem 0.75rem;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.08);
+	}
+	.search:focus-within {
+		border-color: var(--accent-light);
+		background: rgba(255, 255, 255, 0.12);
+	}
+	.search input {
+		flex: 1;
+		min-width: 0;
+		border: 0;
+		background: none;
+		color: var(--header-fg);
+		font: inherit;
+		font-size: 0.85rem;
+	}
+	.search input::placeholder {
+		color: var(--header-fg-muted);
+	}
+	.search input:focus {
+		outline: none;
+	}
+	/* 検索欄の中の × は地色と噛み合わないので消す */
+	.search input::-webkit-search-cancel-button {
+		appearance: none;
+	}
+	.search button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: none;
+		width: 1.9rem;
+		height: 1.9rem;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: none;
+		color: var(--header-fg-muted);
+		cursor: pointer;
+	}
+	.search button:hover {
+		background: rgba(255, 255, 255, 0.12);
+		color: var(--header-fg);
+	}
+
+	@media (max-width: 34rem) {
+		.top {
+			flex-wrap: wrap;
+			gap: 0.6rem;
+		}
+		.search {
+			width: 100%;
+		}
 	}
 </style>

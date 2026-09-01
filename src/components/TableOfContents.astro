@@ -49,17 +49,20 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
 		if (targets.length === 0) return;
 
-		// sticky ヘッダーの下あたりを判定線にする
-		const OFFSET = 110;
+		// sticky ヘッダーの下あたりを判定線にする。高さは実測なので、
+		// ヘッダーの段数を変えても勝手に追従する
+		const header = document.querySelector<HTMLElement>('header');
+		const offset = () => (header?.offsetHeight ?? 0) + 40;
 		let current: HTMLAnchorElement | null = null;
 		let ticking = false;
 
 		function update() {
 			ticking = false;
 
+			const line = offset();
 			let active = targets[0];
 			for (const target of targets) {
-				if (target.heading.getBoundingClientRect().top <= OFFSET) active = target;
+				if (target.heading.getBoundingClientRect().top <= line) active = target;
 				else break;
 			}
 

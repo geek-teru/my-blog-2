@@ -29,6 +29,13 @@
 	--header-fg: #ffffff;
 	--header-fg-muted: rgba(255, 255, 255, 0.7);
 
+	/*
+	  sticky ヘッダーの高さ。目次の追従位置とアンカーの逃がし量がこれに依存する。
+	  ここは初期値で、実際の高さは Header.astro が実測して上書きする。
+	  段数やパディングを変えても追従させるため、値を手で持たない。
+	*/
+	--header-h: 6rem;
+
 	/* 記事本文の読みやすい幅。カードを3列並べる一覧だけ .wide で広げる */
 	--measure: 44rem;
 	--radius: 8px;
@@ -115,7 +122,7 @@ h6 {
   目次のリンク先が隠れて「どこに飛んだか分からない」状態を防ぐ。
 */
 .prose :is(h2, h3, h4, h5, h6) {
-	scroll-margin-top: 5rem;
+	scroll-margin-top: calc(var(--header-h) + 1.5rem);
 }
 
 /* 本文中の見出しは、前の節との間を空けて区切りを作る */

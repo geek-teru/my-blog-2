@@ -98,8 +98,8 @@ const hasToc = (headings ?? []).filter((h) => h.depth === 2 || h.depth === 3).le
 	.side {
 		position: sticky;
 		/* ヘッダーが sticky なので、その高さぶん下げないと隠れる */
-		top: 4.5rem;
-		max-height: calc(100vh - 6rem);
+		top: calc(var(--header-h) + 1.5rem);
+		max-height: calc(100vh - var(--header-h) - 3rem);
 		overflow-y: auto;
 	}
 	.content {
