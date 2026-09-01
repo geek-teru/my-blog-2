@@ -24,9 +24,9 @@
    別枠で記録する。フェーズは移行の筋道、寄り道はその横で起きたこと
 
 ### なぜこの順番か
-デプロイ（Phase 5）を、記事リポジトリの分離（Phase 6）より**前**に置いている。
-逆にすると「submodule の問題なのか Vercel の設定なのか」の切り分けができなくなるため。
-まず単一リポジトリで確実に本番を通し、そのあと分離する。
+デプロイ（Phase 5）を先に置いたのは、まず単一リポジトリで確実に本番を通してから
+記事リポジトリの分離に進むためだった。**その分離（旧 Phase 6）は 2026-09-01 に取りやめた**
+（理由は下記「Phase 6 — 取りやめ」）。結果として、Phase 5 の次は Keystatic になる。
 
 ---
 
@@ -116,10 +116,10 @@
 着手前に潰しておく判断。ここが決まらないと後で手戻りする。
 
 - [x] **プロジェクトディレクトリ名を決める** → `ws/my-blog-2`
-- [x] **`ws/blog` を content リポジトリ本体にするか** → **しない。`ws/blog-content` を新設する**
-      `ws/blog` は Git 管理しない下書き置き場のまま残し、公開する記事だけを content リポジトリへ移す。
-      → 帰結: 「書く → push → 公開」が一直線にはならず、`ws/blog` → content リポジトリの
-        受け渡し工程が残る。Phase 8 でここの導線を決める
+- [x] ~~**`ws/blog` を content リポジトリ本体にするか** → しない。`ws/blog-content` を新設する~~
+      → **2026-09-01 撤回。** リポジトリの分離自体をやめたため、`ws/blog-content` は作らない
+        （Phase 6 参照）。`ws/blog` を下書き置き場のまま残す点は変わらず、
+        `ws/blog` → `content/blog` の受け渡し工程は Phase 8 の課題として残る
 - [x] **既存 microCMS 記事を移行するか** → **しない**
       md が生テキストで表示されている状態の記事であり、持ち込む価値が薄い。
       新ブログは `ws/blog` の4記事から再スタートする。→ Phase 8 の移行作業は不要
@@ -138,11 +138,12 @@
    Keystatic の管理画面と OAuth コールバックだけサーバ側で動かす構成にする
    （環境変数 4つ: `KEYSTATIC_GITHUB_CLIENT_ID` / `KEYSTATIC_GITHUB_CLIENT_SECRET` /
    `KEYSTATIC_SECRET` / `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`）
-2. **Keystatic のコミット先と submodule のポインタがズレる。**
+2. ~~**Keystatic のコミット先と submodule のポインタがズレる。**
    Keystatic は content リポジトリへ直接コミットするが、submodule はコミットを固定するため、
-   content 側への push だけではサイト側のビルドは新しい記事を拾わない。
-   サイト側の submodule ポインタを進める導線（GitHub Actions + Vercel Deploy Hook 等）が要る。
-   → Phase 6 の最後の項目と Phase 7 がここで繋がる。Phase 6 で先に潰しておく
+   content 側への push だけではサイト側のビルドは新しい記事を拾わない。~~
+   → **2026-09-01: この制約が決め手となって、リポジトリの分離自体を取りやめた。**
+     分離しなければ Keystatic のコミット先と Vercel の監視先が同じになり、
+     中継の仕組みが要らなくなる（Phase 6 参照）
 
 **完了条件**: 上記すべてに答えが出ている → **達成**
 
@@ -380,24 +381,41 @@ Phase 5 と Phase 6 の間で、フェーズには無い作業をまとめて行
 
 ---
 
-## Phase 6 — 記事リポジトリの分離（★外部アクション）
+## Phase 6 — 記事リポジトリの分離 ❌ 取りやめ（2026-09-01）
 
-要件④の本体。Phase 5 が安定してから着手する。
+要件④の本体として計画していたが、**着手前に取りやめた**。Phase 0 の
+「`ws/blog-content` を新設する」という決定も撤回する。
 
-- [ ] content リポジトリ用のディレクトリ `ws/blog-content` を新設し、GitHub リポジトリを作成（★確認）
-      ※ `ws/blog` は下書き置き場として残す（Phase 0 の決定）
-- [ ] `content/blog` の中身を `ws/blog-content` へ移す
-- [ ] サイト側の `content/blog` を submodule として繋ぐ
-- [ ] ローカルでビルドが通る
-- [ ] **Vercel 上で submodule 込みのビルドが通るか確認**（未検証事項）
-      → 詰まる場合は content リポジトリを public にする、または
-        GitHub Actions で両方 checkout する方式に切り替え
-- [ ] **記事だけを更新したときにサイトが再ビルドされる導線を作る**（Phase 0 の追加前提2）
-      submodule はコミットを固定するため、content への push だけではサイトは更新されない。
-      content リポジトリの GitHub Actions で「サイト側の submodule ポインタを進めて push」
-      するのが最小構成。Vercel Deploy Hook を叩くだけではポインタが古いままなので不十分
+### 取りやめた理由
 
-**完了条件**: 記事リポジトリへの push だけで記事が公開される
+**分離すると、ブラウザ編集のプレビューが成立しない。**
+
+Vercel が見ているのはサイト側のリポジトリなので、Keystatic が content リポジトリへ
+コミットしても何も起きない。submodule は参照するコミットを固定する仕組みで、
+content 側が進んでもサイト側のポインタは古いままだからだ。プレビューを出すには
+「content 側の Actions がサイト側の submodule ポインタを進めて push する」中継が要る。
+
+これは Phase 0 の調査で「追加の前提2」として挙げていた問題そのもので、
+**分離しなければ経路ごと消える。**
+
+一方、要件④の目的（記事をブログシステムに縛られない形で持つ）は分離しなくても
+達成できている。`content/blog/*.md` は素の Markdown で、ディレクトリごとコピーすれば
+他へ移せる。履歴を分けて追いたいだけなら `git log content/` で足りる。
+
+後から切り出すのも難しくない。別リポジトリにして submodule にするだけで、
+記事ファイル自体は1文字も変わらない。**いま分けない判断は後戻りできる。**
+
+### この判断で消えたもの
+
+- `ws/blog-content` リポジトリの新設
+- submodule 化と、Vercel での submodule ビルド検証（未検証事項がひとつ消えた）
+- content から サイトへ再ビルドを中継する GitHub Actions
+
+### 記事の置き場（変更なし）
+
+`content/blog/` のまま。`src/` の外に置く配置は維持する。
+記事とサイトのコードを混ぜない意味で有効で、切り出したくなったときに
+そのまま submodule 化できる余地も残るため。
 
 ---
 
@@ -405,19 +423,56 @@ Phase 5 と Phase 6 の間で、フェーズには無い作業をまとめて行
 
 要件③の本体。Phase 0 で実現可能性を確認済みである前提。
 
-- [ ] **`@astrojs/vercel` アダプタを導入し、Keystatic の API ルートをサーバ側で動かす**
-      （Phase 0 の追加前提1。静的出力のみでは GitHub モードが成立しない）
-- [ ] Keystatic を導入
-- [ ] `keystatic.config.ts` の `storage` を content リポジトリ（`repo: { owner, name }`）に向ける
+- [ ] `@keystatic/core` `@keystatic/astro` を導入（`npx astro add react markdoc` も要る）
+- [ ] **`@astrojs/vercel` アダプタを導入する**
+      Keystatic は GitHub 認証のコールバックとトークン交換をサーバ側で行う。
+      ブラウザに出せないシークレットを扱うため、静的出力だけでは成立しない。
+      記事ページは静的のまま、`/keystatic` まわりだけサーバで動く hybrid 構成になる
 - [ ] `keystatic.config.ts` でスキーマを Phase 2 の frontmatter と一致させる
-- [ ] ローカルモード（`storage: { kind: 'local' }`）で編集できることを確認
+      （`title` / `description` / `pubDate` / `tags` / `draft` / `heroImage`）
+      ※ ずれるとブラウザで保存した瞬間に Astro 側のスキーマ検証で落ちる
+- [ ] **`storage` を環境で切り替える**
+      ```ts
+      storage: import.meta.env.DEV
+        ? { kind: 'local' }   // ローカルのファイルを直接書き換える。コミットなし
+        : { kind: 'github', repo: { owner: 'geek-teru', name: 'my-blog-2' } }
+      ```
+      手元で `astro dev` を動かしている間は、管理画面を使ってもコミットが発生しない。
+      反復して書き直すのはこちらで行う（下記「執筆とプレビューの運用」）
+- [ ] ローカルモードで編集できることを確認
 - [ ] GitHub モードに切り替え（★確認 / GitHub App のインストールが要る）
-      → GitHub App は **content リポジトリ**に対して write 権限でインストールする
+      → GitHub App は **サイトと同じリポジトリ**（`geek-teru/my-blog-2`）に write 権限で入れる
       → 環境変数 4つを Vercel 側にも設定する
+        （`KEYSTATIC_GITHUB_CLIENT_ID` / `KEYSTATIC_GITHUB_CLIENT_SECRET` /
+        `KEYSTATIC_SECRET` / `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`）
+- [ ] `branchPrefix` を設定し、管理画面から作れるブランチを絞る
 - [ ] **画像のドラッグ&ドロップが動き、リポジトリにファイルが入ることを確認**
 - [ ] スマホのブラウザから編集できることを確認
 
 **完了条件**: ブラウザから記事を書き、画像を貼り、公開できる
+
+### 執筆とプレビューの運用（2026-09-01 決定）
+
+Keystatic は git をデータベースとして使うので、**GitHub モードでは保存＝コミット**。
+反復して書き直すとコミットが積み上がる。そこで**ループごとに使う層を変える**。
+
+| ループ | 使う層 | コミット |
+|---|---|---|
+| 文章を書き直しては見る（**反復はここ**） | `astro dev` + Keystatic ローカルモード | **0回** |
+| 本番ビルドで崩れないか確認 | PR の Preview Deployment | 1回 |
+| 書けたが公開はまだ | `draft: true` | — |
+
+1. **書くのはローカル。** `astro dev` を立てて、エディタか Keystatic のローカルモードで反復
+2. 仕上がったらブランチを切ってコミット → PR → プレビューで本番ビルドを確認
+3. マージして公開。まだ出したくなければ `draft: true` のままマージ
+4. 手元に PC が無いときだけ GitHub モード。ブランチで保存を重ね、**squash merge** で
+   `main` には1コミットだけ入れる。散らかるのはブランチの中だけに留める
+
+**リモートで見るには必ずコミットが要る**（git がデータベースなので避けられない）。
+だから反復をリモートに置かない。プレビュー3層はこの使い分けのために用意したもの。
+
+なお push のたびに Vercel がビルドするため、反復をリモートでやると
+**ビルド回数の面でも不利**。Hobby プランには1日あたりのデプロイ数の上限がある。
 
 ---
 
@@ -426,9 +481,10 @@ Phase 5 と Phase 6 の間で、フェーズには無い作業をまとめて行
 - ~~既存 microCMS 記事の移行~~ → **不要**（Phase 0 で「移行しない」と決定）
 - ~~独自ドメインの切り替え / 旧 URL からのリダイレクト~~ → **不要**（Phase 0 で「引き継がない」と決定）
 - [ ] 旧 Gatsby / microCMS の停止（★確認）
-- [ ] **`ws/blog`（下書き）→ `ws/blog-content`（公開）の受け渡し導線を決める**
-      Phase 0 で `ws/blog` を下書き置き場のまま残すと決めたため、ここが手作業のまま残っている。
-      案: `today` スキルの出力先自体を `ws/blog-content` に変える / 公開用のコピースクリプトを作る
+- [ ] **`ws/blog`（下書き）→ `content/blog`（公開）の受け渡し導線を決める**
+      `ws/blog` を下書き置き場のまま残しているため、ここが手作業で残っている。
+      案: `today` スキルの出力先を `content/blog` に変える / 公開用のコピースクリプトを作る
+      ※ 分離を取りやめたので、移す先は別リポジトリではなくこのリポジトリの `content/blog`
 - [ ] `today` スキルを、最初から frontmatter 付き md を吐くよう更新
       → `import-posts.mjs` による正規化が不要になる
 
@@ -438,7 +494,7 @@ Phase 5 と Phase 6 の間で、フェーズには無い作業をまとめて行
 
 ## 現在地
 
-**Phase 5 まで完了。次は Phase 6（記事リポジトリの分離 / ★外部アクション）。**
+**Phase 5 まで完了。Phase 6 は取りやめ。次は Phase 7（Keystatic / ★外部アクション）。**
 
 Phase 5 と Phase 6 の間に、見た目の作り直しという寄り道が入っている（上記「寄り道の記録」）。
 本番は稼働中で、記事1本が公開され、Career ページが載っている状態。
@@ -450,10 +506,11 @@ Phase 5 と Phase 6 の間に、見た目の作り直しという寄り道が入
 | サイト名 | `Teru's Home` |
 | 本番 URL | https://my-blog-2-terus-projects-8b7c1ca7.vercel.app |
 | GitHub | https://github.com/geek-teru/my-blog-2 （public / `main`） |
-| content リポジトリ | `ws/blog-content` を新設予定。`ws/blog` は下書き置き場のまま |
+| 記事リポジトリの分離 | **しない**（2026-09-01 に要件④を撤回）。`content/blog/` のまま |
+| 執筆の反復 | ローカル（`astro dev` + Keystatic ローカルモード）。コミットは仕上がってから |
 | microCMS 記事の移行 | しない |
 | 独自ドメイン | 引き継がない |
-| Keystatic の別リポジトリ参照 | 可能（要 Vercel アダプタ / submodule ポインタ更新の導線） |
+| Keystatic の保存先 | サイトと同じリポジトリ。手元では `storage: local` でコミットを出さない |
 
 `gh` は WSL(Ubuntu) に 2.98.0 が入っており `geek-teru` で認証済み
 （scopes: repo, workflow, gist, read:org）。

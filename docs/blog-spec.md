@@ -45,7 +45,8 @@ Gatsby は Netlify 買収後、実質メンテナンスモード。v5 以降の�
 1. **プレビューが見れる**
 2. **ストレージ容量が大きい**
 3. **画像を貼れる**
-4. **記事ファイルはブログシステムとは別で管理したい**
+4. ~~**記事ファイルはブログシステムとは別で管理したい**~~
+   → **2026-09-01 撤回。** 分離しない判断に変更（理由は3節）
 
 ヒアリングで確定した前提:
 
@@ -58,8 +59,8 @@ Gatsby は Netlify 買収後、実質メンテナンスモード。v5 以降の�
 
 ```
 Astro（最新の 7.x）+ Content Layer API
-  記事      : 別リポジトリの Markdown
-  画像      : content リポジトリに同梱（増えたら Cloudflare R2 へ逃がせる形にしておく）
+  記事      : サイトと同じリポジトリの content/blog/*.md（素の Markdown）
+  画像      : content/blog/images/ に同梱（増えたら Cloudflare R2 へ逃がせる形にしておく）
   編集      : ローカルエディタ + Keystatic（ブラウザ）の両刀
   配信      : Vercel（既存アカウント・設定を流用）
   プレビュー : astro dev / Vercel Preview Deployment / frontmatter の draft: true
@@ -72,7 +73,7 @@ Astro（最新の 7.x）+ Content Layer API
 | ① プレビュー | `astro dev` で即時反映 / PR ごとに Preview Deployment の URL / `draft: true` で本番ビルドから除外 | 3層。現状の microCMS プレビューより手厚い |
 | ② ストレージ | 当面は content リポジトリに同梱（GitHub は 1リポジトリ 1GB 推奨・1ファイル 100MB 上限） | スクショ数枚/記事なら十分。逼迫したら Cloudflare R2（無料枠 10GB・**egress 課金なし**）へ移す |
 | ③ 画像を貼れる | Keystatic の管理画面でドラッグ&ドロップ。保存先はリポジトリの実ファイル | ローカルでは VS Code の画像ペースト拡張 / Obsidian |
-| ④ 記事を別管理 | 記事を**独立した Git リポジトリ**にし、サイト側から参照する | `ws/blog` がそのまま移行元になる |
+| ④ 記事を別管理 | ~~独立した Git リポジトリにする~~ → **撤回**。同一リポジトリの `content/blog/` に素の Markdown で置く | 下記「④ を撤回した理由」 |
 
 ### CMS を捨てる理由
 ヘッドレス CMS が効くのは「スマホから書く」「非エンジニアが書く」場合。
@@ -80,32 +81,52 @@ Astro（最新の 7.x）+ Content Layer API
 CMS は「md を HTML に変換して貼る」という余計な工程を挟むだけの摩擦になる。
 
 Keystatic は CMS のような編集 UI を提供しつつ、**保存先がリポジトリの md ファイル**なので、
-要件③（画像を貼れる）と要件④（別管理）を同時に満たせる。ここが構成の要。
+要件③（画像を貼れる）を満たしながら、記事を素の Markdown のまま保てる。ここが構成の要。
+
+### ④ を撤回した理由（2026-09-01）
+
+**リポジトリを分けると、ブラウザ編集のプレビューが成立しなくなる。**
+
+Vercel が見ているのはサイト側のリポジトリなので、Keystatic が content リポジトリへ
+コミットしても何も起きない。submodule は参照するコミットを固定する仕組みで、
+content 側が進んでもサイト側のポインタは古いままだからだ。
+プレビューを出すには、content 側から サイト側の submodule ポインタを進める
+中継の GitHub Actions が要る。**分離しなければ、この経路ごと不要になる。**
+
+一方、④ の目的（記事をブログシステムに縛られない形で持つ）は、分離しなくても
+達成できている。`content/blog/*.md` は素の Markdown で、フレームワークに依存する
+記述を含まない。**ディレクトリごとコピーすれば他へ移せる。**
+履歴を分けて追いたいだけなら `git log content/` で足りる。
+
+後から切り出すことも難しくない。`content/blog` を別リポジトリにして submodule に
+するだけで、記事ファイル自体は1文字も変わらない。**「後で分けられる」ので、
+いま分けない判断は安全側**という整理。
+
+分離が必要になるのは、記事だけ別の権限で他人に触らせたくなったときぐらい。
 
 ---
 
 ## 4. ディレクトリ構成
 
 ```
-blog-content（リポジトリA / 記事）        my-blog-site（リポジトリB / サイト）
-├── posts/*.md                            ├── src/
-└── images/                               │   ├── pages/
-                                          │   ├── layouts/
-        ▲                                 │   └── content.config.ts
-        └──── submodule 等で参照 ─────────┤── content/blog/  ← A のマウント先
-                                          ├── scripts/import-posts.mjs
-                                          ├── keystatic.config.ts
-                                          └── astro.config.mjs
+my-blog-2（単一リポジトリ）
+├── content/
+│   ├── blog/          ← 記事。素の Markdown + images/
+│   └── career/        ← 経歴。1ファイル1ノード
+├── src/
+│   ├── pages/
+│   ├── layouts/
+│   └── content.config.ts
+├── docs/              ← blog-plan.md / blog-spec.md / style-guide.html
+├── scripts/import-posts.mjs
+├── keystatic.config.ts
+└── astro.config.mjs
 ```
 
-サイト側の `content/blog/` を A のマウント先にする。
-Astro の glob loader の `base` をプロジェクトルート直下に置くことで、
-ローカルでも Vercel でも同じパスで解決でき、submodule 化もできる。
-
-### 繋ぎ方（優先順）
-1. **git submodule** — 一番コードが少ない。content リポジトリを public にすれば Vercel でも素直に通る
-2. **GitHub Actions で両リポジトリを checkout してビルド** — 確実だが CI を書く必要あり
-3. Astro のカスタムローダーで GitHub API から取得 — トークンとキャッシュ制御が面倒。最後の手段
+`content/` を `src/` の外、プロジェクトルート直下に置いている。
+当初は別リポジトリのマウント先にするためだったが、分離をやめた今も
+**記事とサイトのコードを混ぜない**意味で有効なので、この配置は維持する。
+切り出したくなったときにそのまま submodule 化できる余地も残る。
 
 ---
 
@@ -178,11 +199,12 @@ heroImage: ./images/xxx.png    # 任意
 7. **日本語フォントの手当て**（雛形の Atkinson は日本語グリフを持たない。Noto Sans JP 等のフォールバックを global.css に入れる）
 8. `<html lang="en">` → `lang="ja"`、`SITE_TITLE` / `SITE_DESCRIPTION` / `site` URL を実際の値に
 9. `astro dev` で表示確認（**この時点で一度ブラウザ確認する**）
-10. content を別リポジトリに切り出し、submodule 化
+10. Vercel にデプロイ。Preview Deployment の動作確認
 11. Keystatic を導入し、ブラウザ編集と画像アップロードを確認
-12. Vercel にデプロイ。Preview Deployment の動作確認
 
 **9 までがローカルで完結する塊**。10 以降は外部サービスを触るので、都度確認を取る。
+
+※ 当初あった「content を別リポジトリに切り出し submodule 化」は 2026-09-01 に取りやめた（3節）。
 
 ---
 
@@ -197,9 +219,9 @@ heroImage: ./images/xxx.png    # 任意
       - GitHub モードは **Node.js が動く API ルート**を要求する（`@astrojs/vercel` アダプタが要る）。
         環境変数は `KEYSTATIC_GITHUB_CLIENT_ID` / `KEYSTATIC_GITHUB_CLIENT_SECRET` /
         `KEYSTATIC_SECRET` / `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG` の4つ
-      - Keystatic は content リポジトリへ直接コミットするが、**submodule はコミットを固定する**ため、
-        content 側の push だけではサイトのビルドが新しい記事を拾わない。
-        サイト側の submodule ポインタを進める導線が別途必要（plan の Phase 6）
+      - ~~Keystatic は content リポジトリへ直接コミットするが、submodule はコミットを固定するため、
+        サイト側の submodule ポインタを進める導線が別途必要~~
+        → **2026-09-01: リポジトリを分離しない判断にしたため、この制約ごと消えた**
 - [x] **Astro の glob loader の `base` をプロジェクトルート直下 `content/` にできるか**（`src/` 外）
       → **できる**（2026-08-31 / Astro 7.2.9 で確認）。`glob({ base: './content/blog' })` で
       `astro dev` / `astro build` の両方が通り、記事ページ・一覧・RSS・sitemap すべて生成された
@@ -207,15 +229,18 @@ heroImage: ./images/xxx.png    # 任意
       → **効く**（2026-08-31 / Astro 7.2.9 で確認）。`src/` の外にある `content/blog/images/` を
       本文と `heroImage` の両方から相対パスで参照して、dev では `/_image` 経由の webp、
       build では `/_astro/*.webp` への変換（32kB → 16kB）が確認できた
-- [ ] **Vercel での git submodule ビルド** — private リポジトリだと権限で詰まる可能性。public なら素直に通る
+- [x] ~~**Vercel での git submodule ビルド**~~
+      → **2026-09-01: 検証不要になった。**リポジトリを分離しないため submodule を使わない
 - [ ] **各サービスの無料枠の現行値**（R2 10GB / Vercel Hobby 100GB 帯域 / Cloudflare Pages 等）— 変動するので採用前に確認
 
 ## 9. 決定事項（2026-08-31 / plan の Phase 0 で確定）
 
 - [x] **新しいプロジェクトディレクトリ名** → `ws/my-blog-2`
-- [x] **content リポジトリの置き場** → **`ws/blog-content` を新設**。
-      `ws/blog` は Git 管理しない下書き置き場のまま残す
-      → 帰結: `ws/blog` → `ws/blog-content` の受け渡し工程が残る（11節の課題として残置）
+- [x] ~~**content リポジトリの置き場** → `ws/blog-content` を新設~~
+      → **2026-09-01 撤回。** リポジトリの分離自体をやめたため作らない（3節）。
+        記事は同一リポジトリの `content/blog/` に置く。
+        `ws/blog` を Git 管理しない下書き置き場のまま残す点は変わらず、
+        `ws/blog` → `content/blog` の受け渡し工程は残る（11節の課題）
 - [x] **既存 microCMS 記事を移行するか** → **しない**。新ブログは `ws/blog` の4記事から再スタート
 - [x] **既存ブログの URL / 独自ドメインを引き継ぐか** → **引き継がない**。Vercel 発行の URL を使う。
       既存 Gatsby の `siteUrl` は Gatsby スターターの初期値のままで、独自ドメイン設定の形跡なし
