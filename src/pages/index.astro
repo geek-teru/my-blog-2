@@ -3,7 +3,8 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Header from '../components/Header.astro';
-import PostList from '../components/PostList.astro';
+import PostGraph from '../components/PostGraph.astro';
+import TerminalIntro from '../components/TerminalIntro.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { getPublishedPosts } from '../lib/posts';
 
@@ -13,7 +14,7 @@ const hasMore = posts.length > latest.length;
 ---
 
 <!doctype html>
-<html lang="ja" class="wide">
+<html lang="ja">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
@@ -22,16 +23,12 @@ const hasMore = posts.length > latest.length;
 		<Breadcrumbs />
 		<main>
 			<section class="intro">
-				<h1>{SITE_TITLE}</h1>
-				<p>
-					手を動かして学んだことを、そのまま記事にしていくブログです。
-					Next.js / Supabase / Claude Code まわりの検証ログが中心です。
-				</p>
+				<TerminalIntro />
 			</section>
 
 			<section>
 				<h2 class="section-title">最近の記事</h2>
-				<PostList posts={latest} />
+				<PostGraph posts={latest} />
 				{
 					hasMore && (
 						<p class="more">
@@ -50,16 +47,9 @@ const hasMore = posts.length > latest.length;
 	  トップは「自己紹介 + 最近の記事」にした。記事一覧と分けて置くと、
 	  記事が数本の段階ではトップに実質的な中身が無くなる。
 	*/
+	/* ターミナル自体が枠を持つので、区切りの罫線は重ねない */
 	.intro {
-		padding-bottom: 2.5rem;
-		border-bottom: 1px solid rgb(var(--gray-light));
-	}
-	.intro h1 {
-		margin-bottom: 0.8rem;
-	}
-	.intro p {
-		margin: 0;
-		color: rgb(var(--gray));
+		padding-bottom: 1rem;
 	}
 	.section-title {
 		margin: 2.5rem 0 1.5rem;
