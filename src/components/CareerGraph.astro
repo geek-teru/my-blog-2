@@ -1,0 +1,224 @@
+---
+import { render } from 'astro:content';
+import { getCareerBranches } from '../lib/career';
+
+const branches = await getCareerBranches();
+
+// 業務詳細は Markdown 本文なので、描画用のコンポーネントを先に作っておく。
+// 本文が空のもの（節目や、詳細を書いていない案件）には作らない。
+const graph = await Promise.all(
+	branches.map(async (branch) => ({
+		...branch,
+		nodes: await Promise.all(
+			branch.entries.map(async (entry) => ({
+				entry,
+				Details: entry.body?.trim() ? (await render(entry)).Content : null,
+			})),
+		),
+	})),
+);
+---
+
+<div class="graph">
+	{
+		graph.map((branch) => (
+			<section class:list={['branch', 'commit-graph', { active: branch.current }]}>
+				<ol class="commits commit-list">
+					{branch.nodes.map(({ entry, Details }, i) => (
+						<li
+							class:list={['commit-row', { milestone: entry.data.kind === 'milestone' }]}
+							style={`--i:${i}`}
+						>
+							<span class="dot commit-dot" aria-hidden="true" />
+							<div class="commit">
+								<p class="period">
+									{entry.data.to ? `${entry.data.from} – ${entry.data.to}` : entry.data.from}
+								</p>
+
+								{entry.data.kind === 'milestone' ? (
+									<p class="milestone-title">{entry.data.title}</p>
+								) : (
+									<h3>{entry.data.title}</h3>
+								)}
+
+								{entry.data.summary.length > 0 && (
+									<ul class="summary">
+										{entry.data.summary.map((bullet) => (
+											<li>{bullet}</li>
+										))}
+									</ul>
+								)}
+
+								{Details && (
+									<details>
+										<summary>業務詳細</summary>
+										<div class="detail-body">
+											<Details />
+										</div>
+									</details>
+								)}
+							</div>
+						</li>
+					))}
+				</ol>
+			</section>
+		))
+	}
+</div>
+
+<style>
+	/*
+	  経歴をコミットグラフに見立てる。線と丸の見た目は global.css の
+	  .commit-graph 側にあり、トップの記事一覧と共有している。
+	  ここに置くのは、この画面でしか使わないものだけ。
+
+	    ブランチ = 所属の期 / 輪郭だけの丸 = 案件 / 塗りつぶした丸 = 節目
+	*/
+	.branch {
+		/*
+		  先頭に来るのが案件の丸なので、その中心から線を引き始める。
+		  トップは先頭に main のラベルが来るぶん、既定値のままでよい。
+		*/
+		--rail-top: 0.74rem;
+	}
+	/*
+	  進行中の期だけ水色にする。共通スタイルが色を変数で持っているので、
+	  ここで差し替えるだけで済み、線や丸の指定を複製する必要がない。
+	*/
+	.branch.active {
+		--rail-color: var(--accent-light);
+		--dot-color: var(--accent-light);
+	}
+
+	.commits > li {
+		padding: 0 0 2.2rem;
+	}
+	/* 節目はブランチの終端。下に余白を残すと線を消し込む白帯が伸びて見える */
+	.commits > li.milestone {
+		padding-bottom: 0;
+	}
+
+	.period {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+		font-size: 0.78rem;
+		line-height: 1.6;
+		letter-spacing: 0;
+	}
+	.commit h3 {
+		margin: 0.15rem 0 0.7rem;
+		font-size: 1.05rem;
+		line-height: 1.6;
+	}
+
+	.summary {
+		margin: 0;
+		padding-left: 1.2em;
+		font-size: 0.92rem;
+		line-height: 1.85;
+	}
+	.summary li {
+		margin-bottom: 0.25em;
+	}
+
+	/* 節目のノード。案件の丸は輪郭だけ、こちらは塗りつぶして種類の違いを出す */
+	.milestone {
+		position: relative;
+	}
+	/* 節目の丸は塗りつぶす。色はその期の色に従う */
+	.milestone .dot {
+		background: var(--dot-color);
+	}
+	/*
+	  節目より下に線を伸ばさない。節目はその期の始まりなので、線が続いていると
+	  さらに過去があるように見える。文字の高さに依存しないよう、丸の下から
+	  地色で塗りつぶして消している。
+	*/
+	.milestone::after {
+		content: '';
+		position: absolute;
+		top: 1.15rem;
+		bottom: -1px;
+		left: calc(var(--rail-col) / 2 - 1px);
+		width: 2px;
+		background: var(--bg);
+	}
+	.milestone-title {
+		margin: 0.15rem 0 0;
+		color: rgb(var(--gray-dark));
+		font-size: 0.95rem;
+		font-weight: 700;
+		line-height: 1.6;
+	}
+
+	details {
+		margin-top: 1rem;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: var(--radius);
+		background: var(--bg-subtle);
+	}
+	summary {
+		padding: 0.55rem 0.9rem;
+		color: rgb(var(--gray-dark));
+		font-size: 0.85rem;
+		font-weight: 700;
+		cursor: pointer;
+		list-style: none;
+	}
+	/* 既定の三角を消して、自前の印を左に置く */
+	summary::-webkit-details-marker {
+		display: none;
+	}
+	summary::before {
+		content: '▸';
+		display: inline-block;
+		margin-right: 0.5em;
+		color: rgb(var(--gray));
+		transition: transform 0.15s ease;
+	}
+	details[open] > summary::before {
+		transform: rotate(90deg);
+	}
+	summary:hover {
+		color: var(--accent);
+	}
+	.detail-body {
+		padding: 0.2rem 0.9rem 1rem;
+	}
+	/*
+	  業務詳細は Markdown から描かれるので、スコープ用の属性が付かない。
+	  :global でスコープを抜けないと、ここの指定は一切当たらない。
+	*/
+	.detail-body :global(h3) {
+		margin: 1.1rem 0 0.4rem;
+		font-size: 0.88rem;
+	}
+	.detail-body :global(> :first-child) {
+		margin-top: 0;
+	}
+	.detail-body :global(ul) {
+		margin: 0;
+		padding-left: 1.2em;
+		color: rgb(var(--gray-dark));
+		font-size: 0.88rem;
+		line-height: 1.85;
+	}
+	.detail-body :global(li) {
+		margin-bottom: 0.2em;
+	}
+
+	/*
+	  ブランチの間隔は margin で取る。section の内側に余白の箱を置くと、
+	  線が section いっぱいに引かれる都合で、節目より下にも線が出てしまう。
+	*/
+	.branch + .branch {
+		margin-top: 1.6rem;
+	}
+
+	@media (max-width: 34rem) {
+		.detail-body {
+			padding: 0.2rem 0.7rem 0.9rem;
+		}
+	}
+</style>

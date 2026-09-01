@@ -74,9 +74,15 @@ const hasToc = (headings ?? []).filter((h) => h.depth === 2 || h.depth === 3).le
 					</div>
 				</article>
 
-				<nav class="post-foot">
-					<a href="/blog">← 記事一覧へ</a>
-				</nav>
+				{
+					/* 日付を持つもの＝記事のときだけ出す。Profile / Career から
+					   記事一覧へ戻す導線は筋が通らない */
+					pubDate && (
+						<nav class="post-foot">
+							<a href="/blog">← 記事一覧へ</a>
+						</nav>
+					)
+				}
 			</div>
 		</main>
 		<Footer />

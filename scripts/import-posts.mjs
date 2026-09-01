@@ -3,7 +3,7 @@
  *
  * 移行元の md には frontmatter が無く、タイトルの持ち方も日付の有無もバラバラなため、
  * ここで実ファイルに frontmatter を書き込んでしまう。カスタムローダーで吸収しないのは、
- * Keystatic が frontmatter のフィールドを前提に編集 UI を組み立てるため（blog-spec.md 5節）。
+ * Keystatic が frontmatter のフィールドを前提に編集 UI を組み立てるため（docs/blog-spec.md 5節）。
  *
  * 使い方:
  *   node scripts/import-posts.mjs                        # 全 .md を取り込む

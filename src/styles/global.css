@@ -252,6 +252,118 @@ input {
 	}
 }
 
+/* ---------------------------------------------------------------
+   コミットグラフ
+
+   トップの記事一覧（PostGraph）と Career（CareerGraph）で同じ見立てを
+   使うため、線と丸の見た目をここ1か所に置いて両方から参照する。
+   同じ値を2つのコンポーネントに書くと、片方だけ直したときに必ずずれる。
+
+   置き場所ごとに変わるもの（行の間隔、丸の塗り、ホバー）は各コンポーネント側。
+   --------------------------------------------------------------- */
+.commit-graph {
+	--rail-col: 1.2rem; /* 線と丸が入る列の幅 */
+	--gap: 1rem; /* 列と本文の間 */
+	--dot: 0.85rem;
+
+	/*
+	  線と丸の色。使う側が意味を持たせたいときだけ上書きする。
+	  Career では進行中のブランチを水色にするために差し替えている。
+	  色を直値で焼き込むと、区別を足したくなった時点でスタイルごと
+	  複製することになるので、最初から変数で外に出しておく。
+	*/
+	--rail-color: rgb(var(--gray-light));
+	--dot-color: rgb(var(--gray));
+
+	position: relative;
+}
+
+/* ブランチ線。上から伸びる */
+.commit-graph::before {
+	content: '';
+	position: absolute;
+	/* 線の始点。先頭に何が来るかで変わるので変数にしてある */
+	top: var(--rail-top, 0.5rem);
+	bottom: 0;
+	left: calc(var(--rail-col) / 2 - 1px);
+	width: 2px;
+	background: var(--rail-color);
+	transform: scaleY(0);
+	transform-origin: top;
+	animation: commit-rail 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.commit-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/*
+  丸と本文を並べる行。丸は絶対配置ではなくグリッドの1列目に置く。
+  絶対配置だと基準の箱が行ごとに変わり、線と丸の中心が噛み合わなくなる。
+*/
+.commit-row {
+	display: grid;
+	grid-template-columns: var(--rail-col) minmax(0, 1fr);
+	column-gap: var(--gap);
+	align-items: start;
+	margin: 0;
+}
+
+/* コミットの丸。線の上に重ねるので地色で塗り、線を隠して節に見せる */
+.commit-dot {
+	justify-self: center;
+	/*
+	  枠線を持つので border-box にする。既定の content-box のままだと
+	  中心の計算に枠線ぶんが乗らず、線から 2px ずれる。
+	*/
+	box-sizing: border-box;
+	width: var(--dot);
+	height: var(--dot);
+	margin-top: 0.32rem;
+	border: 2px solid var(--dot-color);
+	border-radius: 999px;
+	background: var(--bg);
+	opacity: 0;
+	transform: scale(0.3);
+	animation: commit-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+	/* 線が伸びるのを追いかけるように、上から順に灯す */
+	animation-delay: calc(0.3s + var(--i, 0) * 0.16s);
+	transition:
+		border-color 0.15s ease,
+		background 0.15s ease;
+}
+
+@keyframes commit-rail {
+	to {
+		transform: scaleY(1);
+	}
+}
+@keyframes commit-pop {
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+/*
+  動きを減らす設定の人には、完成した状態をそのまま出す。
+  アニメーションを消すだけだと初期値（scaleY(0) / opacity:0）で止まり、
+  線も丸も消えてしまう。
+*/
+@media (prefers-reduced-motion: reduce) {
+	.commit-graph::before {
+		animation: none;
+		transform: scaleY(1);
+	}
+	.commit-dot {
+		animation: none;
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
 .sr-only {
 	border: 0;
 	padding: 0;
