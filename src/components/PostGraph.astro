@@ -74,7 +74,7 @@ const { posts } = Astro.props;
 	}
 
 	.branch,
-	.commits li {
+	.commits > li {
 		display: grid;
 		grid-template-columns: var(--rail-col) minmax(0, 1fr);
 		column-gap: var(--gap);
@@ -103,11 +103,11 @@ const { posts } = Astro.props;
 		padding: 0;
 		list-style: none;
 	}
-	.commits li {
+	.commits > li {
 		margin: 0;
 		padding: 0 0 1.8rem;
 	}
-	.commits li:last-child {
+	.commits > li:last-child {
 		padding-bottom: 0;
 	}
 	.commits a {
@@ -140,7 +140,7 @@ const { posts } = Astro.props;
 			background 0.15s ease;
 	}
 	/* 丸はリンクの外にあるので、行全体のホバーで拾う */
-	.commits li:hover .dot {
+	.commits > li:hover .dot {
 		border-color: var(--accent-light);
 		background: var(--accent-light);
 	}
@@ -168,7 +168,7 @@ const { posts } = Astro.props;
 		font-weight: 700;
 		line-height: 1.6;
 	}
-	.commits li:hover .title {
+	.commits > li:hover .title {
 		color: var(--accent);
 	}
 	.excerpt {
