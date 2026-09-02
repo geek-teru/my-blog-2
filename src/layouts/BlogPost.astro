@@ -26,14 +26,14 @@ const hasToc = (headings ?? []).filter((h) => h.depth === 2 || h.depth === 3).le
 ---
 
 <!doctype html>
-<html lang="ja" class:list={{ wide: hasToc }}>
+<html lang="ja">
 	<head>
 		<BaseHead title={title} description={description} type="article" />
 	</head>
 	<body>
 		<Header />
 		<Breadcrumbs current={title} />
-		<main class:list={['post', { 'with-side': hasToc }]}>
+		<main class:list={['post', hasToc ? 'with-side' : 'narrow']}>
 			{
 				hasToc && (
 					<aside class="side">
