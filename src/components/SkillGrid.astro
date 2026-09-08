@@ -12,7 +12,7 @@ import { skillGroups } from '../data/skills';
 					{group.items.map((skill) => (
 						<li class="chip">
 							{/* ロゴが無いスキルはテキストだけになる。高さと余白は変えない */}
-							{skill.icon && <Icon name={`simple-icons:${skill.icon}`} aria-hidden="true" />}
+							{skill.icon && <Icon name={`simple-icons:${skill.icon}`} style={skill.color ? `color: ${skill.color}` : undefined} aria-hidden="true" />}
 							<span>{skill.name}</span>
 						</li>
 					))}
@@ -60,7 +60,7 @@ import { skillGroups } from '../data/skills';
 		font-size: 0.82rem;
 		line-height: 1.4;
 	}
-	/* ロゴは本文色を継ぐ。ブランドカラーは使わない */
+	/* 色は skills.ts の color から currentColor 経由で入る */
 	.chip [data-icon] {
 		width: 1em;
 		height: 1em;
