@@ -20,5 +20,9 @@
   },
   "allowScripts": {
     "esbuild": true
+  },
+  "devDependencies": {
+    "@iconify-json/simple-icons": "^1.2.95",
+    "astro-icon": "^1.2.0"
   }
 }

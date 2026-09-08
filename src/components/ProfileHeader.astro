@@ -1,0 +1,84 @@
+---
+import { Icon } from 'astro-icon/components';
+import { PROFILE_MONOGRAM, SOCIAL_LINKS } from '../consts';
+---
+
+<div class="head">
+	<!-- アバター画像は未用意。頭文字のモノグラムで代替している -->
+	<div class="avatar" aria-hidden="true">{PROFILE_MONOGRAM}</div>
+
+	<h2 class="name">Teru</h2>
+
+	<ul class="links">
+		{
+			SOCIAL_LINKS.map((link) => (
+				<li>
+					{/* アイコンだけなので、読み上げ用の名前は aria-label で補う */}
+					<a href={link.href} aria-label={link.label} title={link.label} rel="me noopener" target="_blank">
+						<Icon name={`simple-icons:${link.icon}`} />
+					</a>
+				</li>
+			))
+		}
+	</ul>
+
+	<p class="bio">プロフィール文は作成中です。</p>
+</div>
+
+<style>
+	.head {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 0.9rem;
+		padding-bottom: 0.5rem;
+	}
+
+	/* ヘッダーと同じネイビーにして、サイト内の他の面と地続きに見せる */
+	.avatar {
+		display: grid;
+		place-items: center;
+		width: 5.5rem;
+		height: 5.5rem;
+		border-radius: 999px;
+		background: var(--navy);
+		color: var(--header-fg);
+		font-size: 2.2rem;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	.name {
+		margin: 0;
+	}
+
+	.links {
+		display: flex;
+		gap: 1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.links a {
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: var(--radius);
+		color: rgb(var(--gray));
+	}
+	.links a:hover {
+		background: var(--bg-subtle);
+		color: rgb(var(--black));
+	}
+	.links [data-icon] {
+		width: 1.15rem;
+		height: 1.15rem;
+	}
+
+	.bio {
+		margin: 0;
+		color: rgb(var(--gray));
+	}
+</style>

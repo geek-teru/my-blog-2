@@ -14,8 +14,9 @@ import { SITE_TITLE } from '../consts';
 		<div class="out" data-out>
 			<h1>{SITE_TITLE}</h1>
 			<p>
-				手を動かして学んだことを、そのまま記事にしていくブログです。
-				Next.js / Supabase / Claude Code まわりの検証ログが中心です。
+				はじめまして、エンジニアのてると申します。
+				エンジニアとしての経歴とスキル、日々学んだことの記録を置いています。
+				Astro+Vercel で構築しています。
 			</p>
 		</div>
 	</div>
@@ -44,10 +45,11 @@ import { SITE_TITLE } from '../consts';
 			return;
 		}
 
-		// 打ち始める前に高さを確保する。打つにつれて背が伸びると、
-		// 下にあるコミットグラフが押し下げられて画面が揺れる
-		const screen = term.querySelector<HTMLElement>('.screen');
-		if (screen) screen.style.minHeight = `${screen.offsetHeight}px`;
+		// 高さの確保は out を visibility: hidden にすることで足りている。
+		// ここで offsetHeight を min-height に焼くと、Web フォントの読み込み前に
+		// 測った高さがそのまま残り、フォント適用後に枠の下へ余白が出る。
+		//
+		// コマンド行は打ち終わるまで1行のままなので、これで画面は揺れない。
 
 		const command = typed.textContent ?? '';
 		typed.textContent = '';
@@ -148,7 +150,7 @@ import { SITE_TITLE } from '../consts';
 	}
 	/*
 	  visibility で消す。display: none だと高さが失われ、
-	  確保しておいた min-height の意味が無くなる
+	  打ち込み中に下のコミットグラフが押し上げられてしまう
 	*/
 	.out.is-hidden {
 		visibility: hidden;
