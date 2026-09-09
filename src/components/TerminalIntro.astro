@@ -21,13 +21,12 @@ const choices = [
 		<div class="out" data-out>
 			<h1>{SITE_TITLE}</h1>
 			<p>
-				はじめまして、エンジニアのてると申します。
-				エンジニアとしての経歴とスキル、日々学んだことの記録を置いています。
+				はじめまして、エンジニアの「てる」と申します。<br />
+				エンジニアとしての経歴とスキル、日々学んだことの記録を置いています。<br />
 				Astro+Vercel で構築しています。
 			</p>
 
-			<nav class="menu" aria-label="サイト内の主なページ">
-				<p class="ask"><span class="q" aria-hidden="true">?</span> どこを見ますか</p>
+			<nav class="menu" aria-label="サイト内の主なページ" data-menu>
 				<ul>
 					{
 						choices.map((choice) => (
@@ -98,7 +97,43 @@ const choices = [
 		setTimeout(step, 400);
 	}
 
+	/**
+	 * 選択肢を上下キーで移動できるようにする。
+	 *
+	 * 動かしているのは DOM の焦点そのもの。Enter は <a> の既定の動作が
+	 * そのまま働くので、こちらでは何もしていない。
+	 *
+	 * キーを拾うのは焦点がリストの中にあるときだけ。ページ全体で拾うと
+	 * 上下キーでのスクロールを奪ってしまう。
+	 */
+	function setupMenu() {
+		const menu = document.querySelector<HTMLElement>('[data-menu]');
+		if (!menu) return;
+
+		const links = Array.from(menu.querySelectorAll('a'));
+		if (links.length === 0) return;
+
+		menu.addEventListener('keydown', (event) => {
+			const current = links.indexOf(document.activeElement as HTMLAnchorElement);
+			if (current === -1) return;
+
+			let next: number;
+			if (event.key === 'ArrowDown') {
+				next = (current + 1) % links.length;
+			} else if (event.key === 'ArrowUp') {
+				next = (current - 1 + links.length) % links.length;
+			} else {
+				return;
+			}
+
+			// 上下キーの既定の動作（スクロール）は止める
+			event.preventDefault();
+			links[next].focus();
+		});
+	}
+
 	setupTerminal();
+	setupMenu();
 </script>
 
 <style>
@@ -198,15 +233,6 @@ const choices = [
 		line-height: 1.6;
 		letter-spacing: 0;
 	}
-	.ask {
-		margin: 0 0 0.4rem;
-		color: rgb(var(--gray-dark));
-	}
-	.q {
-		color: var(--accent-light);
-		font-weight: 700;
-	}
-
 	.menu ul {
 		margin: 0;
 		padding: 0;
