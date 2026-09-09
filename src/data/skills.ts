@@ -54,17 +54,6 @@ export const skillGroups: SkillGroup[] = [
 		],
 	},
 	{
-		title: 'Security',
-		items: [
-			{ name: 'IAM', icon: 'amazoniam', color: '#DD344C' },
-			{ name: 'CloudTrail' },
-			{ name: 'Config' },
-			{ name: 'AWS WAF' },
-			{ name: 'Network Firewall' },
-			{ name: 'Cognito', icon: 'amazoncognito', color: '#DD344C' },
-		],
-	},
-	{
 		title: 'Database / Data Platform',
 		items: [
 			{ name: 'MySQL', icon: 'mysql', color: '#4479A1' },
@@ -80,6 +69,27 @@ export const skillGroups: SkillGroup[] = [
 		],
 	},
 	{
+		title: 'Backend',
+		items: [
+			{ name: 'Go', icon: 'go', color: '#00ADD8' },
+			{ name: 'PHP', icon: 'php', color: '#777BB4' },
+			{ name: 'Python', icon: 'python', color: '#3776AB' },
+			{ name: 'Echo' },
+			{ name: 'Laravel', icon: 'laravel', color: '#FF2D20' },
+		],
+	},
+	{
+		title: 'Security',
+		items: [
+			{ name: 'IAM', icon: 'amazoniam', color: '#DD344C' },
+			{ name: 'CloudTrail' },
+			{ name: 'Config' },
+			{ name: 'AWS WAF' },
+			{ name: 'Network Firewall' },
+			{ name: 'Cognito', icon: 'amazoncognito', color: '#DD344C' },
+		],
+	},
+	{
 		title: 'Tools / CI/CD',
 		items: [
 			{ name: 'Git', icon: 'git', color: '#F03C2E' },
@@ -88,16 +98,6 @@ export const skillGroups: SkillGroup[] = [
 			{ name: 'Jenkins', icon: 'jenkins', color: '#000000' }, // 公式は #D24939
 			{ name: 'CodeBuild' },
 			{ name: 'Docker', icon: 'docker', color: '#2496ED' },
-		],
-	},
-	{
-		title: 'Backend',
-		items: [
-			{ name: 'Go', icon: 'go', color: '#00ADD8' },
-			{ name: 'PHP', icon: 'php', color: '#777BB4' },
-			{ name: 'Python', icon: 'python', color: '#3776AB' },
-			{ name: 'Echo' },
-			{ name: 'Laravel', icon: 'laravel', color: '#FF2D20' },
 		],
 	},
 	{
