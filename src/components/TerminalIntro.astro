@@ -265,33 +265,42 @@ const choices = [
 	}
 
 	/*
-	  既定では先頭の profile に ❯ を出して「選択中」に見せる。
-	  リストに触れている間は、選んでいる行だけに ❯ を出す。
-	  JS を使わずに選択が動いて見えるようにするため。
+	  選択中の行の決め方。上から順に強い。
+
+	  1. ポインタが乗っている行
+	  2. 焦点がある行（ポインタがリストの外にあるときだけ）
+	  3. どちらも無ければ先頭の profile
+
+	  2 に :not(:hover) を付けてあるのが要で、これが無いと
+	  「キーで選んだ行」と「マウスで指した行」の両方が光って二重に見える。
 	*/
 	.marker {
 		color: var(--accent);
 		opacity: 0;
 	}
-	.menu li:first-child .marker {
-		opacity: 1;
-	}
-	/*
-	  :not() で選択中の行を除いてある。これが無いと、先頭の行を選んだときに
-	  「先頭を消す」側が詳細度で勝ってしまい、profile を選んだときだけ ❯ が消える。
-	*/
-	.menu ul:hover li:first-child a:not(:hover) .marker,
-	.menu ul:focus-within li:first-child a:not(:focus-visible) .marker {
-		opacity: 0;
-	}
-	.menu a:hover .marker,
-	.menu a:focus-visible .marker {
+
+	/* 3. 誰も選んでいない間の既定 */
+	.menu ul:not(:hover):not(:focus-within) li:first-child .marker {
 		opacity: 1;
 	}
 
-	.menu a:hover,
-	.menu a:focus-visible {
+	/* 2. 焦点で選ぶ。ポインタがリストに乗ったらマウスに譲る */
+	.menu ul:not(:hover) a:focus-visible {
 		background: var(--accent-soft);
+	}
+	.menu ul:not(:hover) a:focus-visible .marker {
+		opacity: 1;
+	}
+
+	/* 1. ポインタで選ぶ */
+	.menu a:hover {
+		background: var(--accent-soft);
+	}
+	.menu a:hover .marker {
+		opacity: 1;
+	}
+
+	.menu a:focus-visible {
 		outline: none;
 	}
 	.key {
