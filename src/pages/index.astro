@@ -3,7 +3,6 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Header from '../components/Header.astro';
-import NavCards from '../components/NavCards.astro';
 import PostGraph from '../components/PostGraph.astro';
 import TerminalIntro from '../components/TerminalIntro.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
@@ -25,10 +24,6 @@ const hasMore = posts.length > latest.length;
 		<main class="narrow">
 			<section class="intro">
 				<TerminalIntro />
-			</section>
-
-			<section class="nav-cards">
-				<NavCards />
 			</section>
 
 			<section>
@@ -55,9 +50,6 @@ const hasMore = posts.length > latest.length;
 	/* ターミナル自体が枠を持つので、区切りの罫線は重ねない */
 	.intro {
 		padding-bottom: 1rem;
-	}
-	.nav-cards {
-		margin-top: 0.5rem;
 	}
 	.section-title {
 		margin: 2.5rem 0 1.5rem;

@@ -1,5 +1,12 @@
 ---
 import { SITE_TITLE } from '../consts';
+
+/** ターミナルの中に出す行き先。select プロンプト風に並べる */
+const choices = [
+	{ href: '/profile', key: 'profile', text: 'プロフィールとスキル' },
+	{ href: '/career', key: 'career', text: 'これまでの経歴' },
+	{ href: '/blog', key: 'blog', text: '学んだことの記録' },
+];
 ---
 
 <div class="term" data-term>
@@ -18,6 +25,25 @@ import { SITE_TITLE } from '../consts';
 				エンジニアとしての経歴とスキル、日々学んだことの記録を置いています。
 				Astro+Vercel で構築しています。
 			</p>
+
+			<nav class="menu" aria-label="サイト内の主なページ">
+				<p class="ask"><span class="q" aria-hidden="true">?</span> どこを見ますか</p>
+				<ul>
+					{
+						choices.map((choice) => (
+							<li>
+								<a href={choice.href}>
+									<span class="marker" aria-hidden="true">
+										❯
+									</span>
+									<span class="key">{choice.key}</span>
+									<span class="text">{choice.text}</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
 		</div>
 	</div>
 </div>
@@ -162,9 +188,88 @@ import { SITE_TITLE } from '../consts';
 		}
 	}
 
+	/* ---- 選択肢（select プロンプト風） ---- */
+
+	.menu {
+		margin-top: 1.4rem;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+		font-size: 0.86rem;
+		/* 本文の行間のままだと間延びして端末の出力に見えない */
+		line-height: 1.6;
+		letter-spacing: 0;
+	}
+	.ask {
+		margin: 0 0 0.4rem;
+		color: rgb(var(--gray-dark));
+	}
+	.q {
+		color: var(--accent-light);
+		font-weight: 700;
+	}
+
+	.menu ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.menu a {
+		display: grid;
+		grid-template-columns: 1.2rem 6rem 1fr;
+		align-items: baseline;
+		padding: 0.2rem 0.3rem;
+		border-radius: 4px;
+		text-decoration: none;
+		color: rgb(var(--gray));
+	}
+
+	/*
+	  既定では先頭に ❯ を出して「選択中」に見せる。
+	  リストのどこかにポインタが乗ったら先頭のぶんは消し、乗っている行に移す。
+	  JS を使わずに選択が動いて見えるようにするため。
+	*/
+	.marker {
+		color: var(--accent);
+		opacity: 0;
+	}
+	.menu li:first-child .marker {
+		opacity: 1;
+	}
+	.menu ul:hover li:first-child .marker,
+	.menu ul:focus-within li:first-child .marker {
+		opacity: 0;
+	}
+	.menu a:hover .marker,
+	.menu a:focus-visible .marker {
+		opacity: 1;
+	}
+
+	.menu a:hover,
+	.menu a:focus-visible {
+		background: var(--accent-soft);
+		outline: none;
+	}
+	.key {
+		color: rgb(var(--black));
+		font-weight: 700;
+	}
+	.menu a:hover .key,
+	.menu a:focus-visible .key {
+		color: var(--accent);
+	}
+	.menu .text {
+		font-size: 0.92em;
+	}
+
 	@media (max-width: 34rem) {
 		.screen {
 			padding: 1.1rem 1rem 1.3rem;
+		}
+		/* 幅が無いので説明は下に落とす */
+		.menu a {
+			grid-template-columns: 1.2rem 1fr;
+		}
+		.menu .text {
+			grid-column: 2;
 		}
 	}
 </style>
