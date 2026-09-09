@@ -46,8 +46,8 @@ export const skillGroups: SkillGroup[] = [ /* ... */ ];
 
 | カテゴリ | 中身 |
 | --- | --- |
-| インフラ | AWS, Azure, Google Cloud, vSphere, Terraform, Ansible, VPC, Route 53, ALB, ECS, Lambda, AWS Batch, API Gateway, Amplify, Step Functions |
-| セキュリティ | IAM, CloudTrail, Config, AWS WAF, Network Firewall, Cognito |
+| Infrastructure | AWS, Azure, Google Cloud, vSphere, Terraform, Ansible, VPC, Route 53, ALB, ECS, Lambda, AWS Batch, API Gateway, Amplify, Step Functions |
+| Security | IAM, CloudTrail, Config, AWS WAF, Network Firewall, Cognito |
 | Database / Data Platform | MySQL, PostgreSQL, Oracle, RDS, Redshift, S3, Athena, Glue, PySpark, QuickSight |
 | Tools / CI/CD | Git, GitHub, GitHub Actions, Jenkins, CodeBuild, Docker |
 | Backend | Go, PHP, Python, Echo, Laravel |

@@ -34,7 +34,7 @@ const AWS = '#000000';
 
 export const skillGroups: SkillGroup[] = [
 	{
-		title: 'インフラ',
+		title: 'Infrastructure',
 		items: [
 			{ name: 'AWS', icon: 'amazonwebservices', color: AWS }, // 公式は #FF9900
 			{ name: 'Azure', icon: 'microsoftazure' },
@@ -54,7 +54,7 @@ export const skillGroups: SkillGroup[] = [
 		],
 	},
 	{
-		title: 'セキュリティ',
+		title: 'Security',
 		items: [
 			{ name: 'IAM', icon: 'amazoniam', color: AWS },
 			{ name: 'CloudTrail' },
