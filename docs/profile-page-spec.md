@@ -47,13 +47,13 @@ export const skillGroups: SkillGroup[] = [ /* ... */ ];
 | カテゴリ | 中身 |
 | --- | --- |
 | Infrastructure | AWS, Azure, Google Cloud, vSphere, Terraform, Ansible, VPC, Route 53, ALB, ECS, Lambda, AWS Batch, API Gateway, Amplify, Step Functions |
-| Database / Data Platform | MySQL, PostgreSQL, Oracle, RDS, Redshift, S3, Athena, Glue, PySpark, QuickSight |
+| Database / Data Platform | MySQL, PostgreSQL, Oracle, RDS, Redshift, S3, Athena, Glue, Kinesis, PySpark, QuickSight |
 | Backend | Go, PHP, Python, Echo, Laravel |
 | Security | IAM, CloudTrail, Config, AWS WAF, Network Firewall, Cognito |
 | Tools / CI/CD | Git, GitHub, GitHub Actions, Jenkins, CodeBuild, Docker |
 | Monitoring / Logs | Datadog, CloudWatch, CloudWatch Logs, Fluentd |
 
-全46項目のうち **ロゴがあるのは33個、残る13個はテキストだけのチップ**になる。
+全47項目のうち **ロゴがあるのは33個、残る14個はテキストだけのチップ**になる。
 中身は `skills.ts` を編集すれば増減できる。ページ側は配列を舐めるだけにする。
 
 ## アイコン
@@ -70,8 +70,8 @@ CDN から読む方式とアイコンフォントは採らない。リクエス�
 ### ロゴが無いものの扱い
 
 **Simple Icons に全スキルのロゴがあるわけではない。** VPC、AWS Batch、Step Functions、
-CloudTrail、Config、AWS WAF、Network Firewall、Athena、Glue、QuickSight、CodeBuild、
-Echo、CloudWatch Logs の13個が該当する。
+CloudTrail、Config、AWS WAF、Network Firewall、Athena、Glue、Kinesis、QuickSight、
+CodeBuild、Echo、CloudWatch Logs の14個が該当する。
 
 `icon` を省略したら**テキストだけのチップ**にフォールバックする。チップの高さと余白は
 アイコン有無で変えないので、混在しても行が揃う。「アイコンが無いから載せない」という

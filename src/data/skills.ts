@@ -5,7 +5,7 @@
  * 意味を持つため（詳細は docs/profile-page-spec.md）。
  *
  * `icon` は Simple Icons のスラッグ。**省略するとテキストだけのチップになる。**
- * Simple Icons にロゴが無いもの（VPC、CloudTrail、Athena など13個）は、
+ * Simple Icons にロゴが無いもの（VPC、CloudTrail、Athena、Kinesis など14個）は、
  * 無理にそれらしいロゴを当てず省略してテキストで出す。
  *
  * `color` は省略すると本文色を継ぐ。**推測した hex は書かない。**
@@ -64,6 +64,7 @@ export const skillGroups: SkillGroup[] = [
 			{ name: 'S3', icon: 'amazons3', color: '#569A31' },
 			{ name: 'Athena' },
 			{ name: 'Glue' },
+			{ name: 'Kinesis' },
 			{ name: 'PySpark', icon: 'apachespark', color: '#E25A1C' },
 			{ name: 'QuickSight' },
 		],
