@@ -38,7 +38,8 @@ export const skillGroups: SkillGroup[] = [
 		title: 'IaC / CI/CD',
 		items: [
 			{ name: 'Terraform', icon: 'terraform', color: '#844FBA' },
-			{ name: 'Ansible', icon: 'ansible', color: '#EE0000' },
+			// ブランド色は赤 (#EE0000) だが、黒のほうが馴染むので上書きしている
+			{ name: 'Ansible', icon: 'ansible', color: '#000000' },
 			{ name: 'GitHub Actions', icon: 'githubactions', color: '#2088FF' },
 			{ name: 'Jenkins', icon: 'jenkins', color: '#D24939' },
 		],
