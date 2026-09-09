@@ -13,7 +13,13 @@ export type Skill = {
 	name: string;
 	/** Simple Icons のスラッグ。無ければ省略する */
 	icon?: string;
-	/** ブランドカラー。省略すると本文色を継ぐ */
+	/**
+	 * ブランドカラー。省略すると本文色を継ぐ。
+	 *
+	 * 一部は公式色をやめて黒にしている。白背景で沈むもの（AWS）と、
+	 * 赤系が並んで主張しすぎるもの（Ansible、Jenkins）。
+	 * 逸脱している行には公式色を併記してある。
+	 */
 	color?: string;
 };
 
@@ -27,7 +33,7 @@ export const skillGroups: SkillGroup[] = [
 	{
 		title: 'クラウド / インフラ',
 		items: [
-			{ name: 'AWS', icon: 'amazonwebservices', color: '#FF9900' },
+			{ name: 'AWS', icon: 'amazonwebservices', color: '#000000' }, // 公式は #FF9900
 			{ name: 'Google Cloud', icon: 'googlecloud', color: '#4285F4' },
 			{ name: 'vSphere', icon: 'vmware', color: '#607078' },
 			{ name: 'Nginx', icon: 'nginx', color: '#009639' },
@@ -38,10 +44,9 @@ export const skillGroups: SkillGroup[] = [
 		title: 'IaC / CI/CD',
 		items: [
 			{ name: 'Terraform', icon: 'terraform', color: '#844FBA' },
-			// ブランド色は赤 (#EE0000) だが、黒のほうが馴染むので上書きしている
-			{ name: 'Ansible', icon: 'ansible', color: '#000000' },
+			{ name: 'Ansible', icon: 'ansible', color: '#000000' }, // 公式は #EE0000
 			{ name: 'GitHub Actions', icon: 'githubactions', color: '#2088FF' },
-			{ name: 'Jenkins', icon: 'jenkins', color: '#D24939' },
+			{ name: 'Jenkins', icon: 'jenkins', color: '#000000' }, // 公式は #D24939
 		],
 	},
 	{
