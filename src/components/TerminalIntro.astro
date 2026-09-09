@@ -1,5 +1,12 @@
 ---
 import { SITE_TITLE } from '../consts';
+
+/** ターミナルの中に出す行き先。select プロンプト風に並べる */
+const choices = [
+	{ href: '/profile', key: 'profile', text: 'プロフィールとスキル' },
+	{ href: '/career', key: 'career', text: 'これまでの経歴' },
+	{ href: '/blog', key: 'blog', text: '学んだことの記録' },
+];
 ---
 
 <div class="term" data-term>
@@ -14,9 +21,28 @@ import { SITE_TITLE } from '../consts';
 		<div class="out" data-out>
 			<h1>{SITE_TITLE}</h1>
 			<p>
-				手を動かして学んだことを、そのまま記事にしていくブログです。
-				Next.js / Supabase / Claude Code まわりの検証ログが中心です。
+				はじめまして、エンジニアの「てる」と申します。<br />
+				エンジニアとしての経歴とスキル、日々学んだことの記録を置いています。<br />
+				Astro+Vercel で構築しています。
 			</p>
+
+			<nav class="menu" aria-label="サイト内の主なページ">
+				<ul>
+					{
+						choices.map((choice) => (
+							<li>
+								<a href={choice.href}>
+									<span class="marker" aria-hidden="true">
+										❯
+									</span>
+									<span class="key">{choice.key}</span>
+									<span class="text">{choice.text}</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
 		</div>
 	</div>
 </div>
@@ -44,10 +70,11 @@ import { SITE_TITLE } from '../consts';
 			return;
 		}
 
-		// 打ち始める前に高さを確保する。打つにつれて背が伸びると、
-		// 下にあるコミットグラフが押し下げられて画面が揺れる
-		const screen = term.querySelector<HTMLElement>('.screen');
-		if (screen) screen.style.minHeight = `${screen.offsetHeight}px`;
+		// 高さの確保は out を visibility: hidden にすることで足りている。
+		// ここで offsetHeight を min-height に焼くと、Web フォントの読み込み前に
+		// 測った高さがそのまま残り、フォント適用後に枠の下へ余白が出る。
+		//
+		// コマンド行は打ち終わるまで1行のままなので、これで画面は揺れない。
 
 		const command = typed.textContent ?? '';
 		typed.textContent = '';
@@ -148,7 +175,7 @@ import { SITE_TITLE } from '../consts';
 	}
 	/*
 	  visibility で消す。display: none だと高さが失われ、
-	  確保しておいた min-height の意味が無くなる
+	  打ち込み中に下のコミットグラフが押し上げられてしまう
 	*/
 	.out.is-hidden {
 		visibility: hidden;
@@ -160,9 +187,92 @@ import { SITE_TITLE } from '../consts';
 		}
 	}
 
+	/* ---- 選択肢（select プロンプト風） ---- */
+
+	.menu {
+		margin-top: 1.4rem;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+		font-size: 0.86rem;
+		/* 本文の行間のままだと間延びして端末の出力に見えない */
+		line-height: 1.6;
+		letter-spacing: 0;
+	}
+	.menu ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.menu a {
+		display: grid;
+		grid-template-columns: 1.2rem 6rem 1fr;
+		align-items: baseline;
+		padding: 0.2rem 0.3rem;
+		border-radius: 4px;
+		text-decoration: none;
+		color: rgb(var(--gray));
+	}
+
+	/*
+	  選択中の行の決め方。上から順に強い。
+
+	  1. ポインタが乗っている行
+	  2. 焦点がある行（Tab で辿ってきたとき。ポインタがリストの外にあるときだけ）
+	  3. どちらも無ければ先頭の profile
+
+	  2 に :not(:hover) を付けてあるのが要で、これが無いと
+	  「Tab で辿った行」と「マウスで指した行」の両方が光って二重に見える。
+	*/
+	.marker {
+		color: var(--accent);
+		opacity: 0;
+	}
+
+	/* 3. 誰も選んでいない間の既定 */
+	.menu ul:not(:hover):not(:focus-within) li:first-child .marker {
+		opacity: 1;
+	}
+
+	/* 2. 焦点で選ぶ。ポインタがリストに乗ったらマウスに譲る */
+	.menu ul:not(:hover) a:focus-visible {
+		background: var(--accent-soft);
+	}
+	.menu ul:not(:hover) a:focus-visible .marker {
+		opacity: 1;
+	}
+
+	/* 1. ポインタで選ぶ */
+	.menu a:hover {
+		background: var(--accent-soft);
+	}
+	.menu a:hover .marker {
+		opacity: 1;
+	}
+
+	.menu a:focus-visible {
+		outline: none;
+	}
+	.key {
+		color: rgb(var(--black));
+		font-weight: 700;
+	}
+	.menu a:hover .key,
+	.menu ul:not(:hover) a:focus-visible .key {
+		color: var(--accent);
+	}
+	.menu .text {
+		font-size: 0.92em;
+	}
+
 	@media (max-width: 34rem) {
 		.screen {
 			padding: 1.1rem 1rem 1.3rem;
+		}
+		/* 幅が無いので説明は下に落とす */
+		.menu a {
+			grid-template-columns: 1.2rem 1fr;
+		}
+		.menu .text {
+			grid-column: 2;
 		}
 	}
 </style>

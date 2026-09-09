@@ -1,0 +1,69 @@
+---
+import { Icon } from 'astro-icon/components';
+import { skillGroups } from '../data/skills';
+---
+
+<div class="grid">
+	{
+		skillGroups.map((group) => (
+			<section class="card">
+				<h3>{group.title}</h3>
+				<ul>
+					{group.items.map((skill) => (
+						<li class="chip">
+							{/* ロゴが無いスキルはテキストだけになる。高さと余白は変えない */}
+							{skill.icon && <Icon name={`simple-icons:${skill.icon}`} style={skill.color ? `color: ${skill.color}` : undefined} aria-hidden="true" />}
+							<span>{skill.name}</span>
+						</li>
+					))}
+				</ul>
+			</section>
+		))
+	}
+</div>
+
+<style>
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+		gap: 1rem;
+	}
+
+	.card {
+		padding: 1.1rem 1.2rem 1.3rem;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: var(--radius);
+		background: var(--bg-subtle);
+	}
+	.card h3 {
+		margin: 0 0 0.9rem;
+		font-size: 0.95rem;
+	}
+	.card ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.3rem 0.6rem;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 999px;
+		background: var(--bg);
+		color: rgb(var(--gray-dark));
+		font-size: 0.82rem;
+		line-height: 1.4;
+	}
+	/* 色は skills.ts の color から currentColor 経由で入る */
+	.chip [data-icon] {
+		width: 1em;
+		height: 1em;
+		flex: none;
+	}
+</style>
