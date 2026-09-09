@@ -14,12 +14,7 @@ const cards = [
 	{
 		cards.map((card) => (
 			<a href={card.href}>
-				<span class="title">
-					{card.title}
-					<span class="arrow" aria-hidden="true">
-						→
-					</span>
-				</span>
+				<span class="title">{card.title}</span>
 				<span class="text">{card.text}</span>
 			</a>
 		))
@@ -33,50 +28,62 @@ const cards = [
 		gap: 1rem;
 	}
 
-	/* カード全体をリンクにする。中に押せる要素を入れ子にしない */
+	/*
+	  カード全体をリンクにする。中に押せる要素を入れ子にしない。
+
+	  地の色は白のまま、影で面を浮かせている。塗りで区切ると本文より主張が強くなり、
+	  トップの主役であるターミナルとぶつかる。
+	*/
 	.cards a {
 		display: flex;
 		flex-direction: column;
-		gap: 0.3rem;
-		padding: 1rem 1.1rem 1.1rem;
+		gap: 0.35rem;
+		padding: 1.15rem 1.2rem 1.25rem;
 		border: 1px solid rgb(var(--gray-light));
 		border-radius: var(--radius);
-		background: var(--bg-subtle);
+		background: var(--bg);
+		box-shadow: 0 1px 2px rgba(var(--black), 0.04);
 		text-decoration: none;
 		color: inherit;
+		transition:
+			transform 0.18s ease,
+			box-shadow 0.18s ease,
+			border-color 0.18s ease;
 	}
 	.cards a:hover {
+		transform: translateY(-3px);
 		border-color: var(--accent-light);
+		box-shadow: 0 10px 24px rgba(var(--black), 0.09);
+	}
+	.cards a:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
 	}
 
 	.title {
-		display: flex;
-		align-items: center;
-		gap: 0.35rem;
 		color: rgb(var(--black));
+		font-size: 1.02rem;
 		font-weight: 700;
+		letter-spacing: 0.01em;
 	}
 	.cards a:hover .title {
 		color: var(--accent);
 	}
 
-	/* 矢印だけ動かす。カード自体は動かさず、行き先があることだけ示す */
-	.arrow {
-		color: var(--accent);
-		transition: transform 0.15s ease;
-	}
-	.cards a:hover .arrow {
-		transform: translateX(0.2rem);
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.arrow {
-			transition: none;
-		}
-	}
-
 	.text {
 		color: rgb(var(--gray));
-		font-size: 0.85rem;
+		font-size: 0.82rem;
 		line-height: 1.6;
+	}
+
+	/* 動きを減らす設定では浮かせない。色の変化だけ残す */
+	@media (prefers-reduced-motion: reduce) {
+		.cards a {
+			transition: border-color 0.18s ease;
+		}
+		.cards a:hover {
+			transform: none;
+			box-shadow: 0 1px 2px rgba(var(--black), 0.04);
+		}
 	}
 </style>
