@@ -1,0 +1,82 @@
+---
+/**
+ * トップの入口カード。ヘッダーのナビと同じ行き先を、
+ * 本文の中にもう一度置いて「次にどこを見ればいいか」を示す。
+ */
+const cards = [
+	{ href: '/profile', title: 'Profile', text: '経歴とスキル' },
+	{ href: '/career', title: 'Career', text: 'これまでの案件と時期' },
+	{ href: '/blog', title: 'Blog', text: '学んだことの記録' },
+];
+---
+
+<nav class="cards" aria-label="サイト内の主なページ">
+	{
+		cards.map((card) => (
+			<a href={card.href}>
+				<span class="title">
+					{card.title}
+					<span class="arrow" aria-hidden="true">
+						→
+					</span>
+				</span>
+				<span class="text">{card.text}</span>
+			</a>
+		))
+	}
+</nav>
+
+<style>
+	.cards {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+		gap: 1rem;
+	}
+
+	/* カード全体をリンクにする。中に押せる要素を入れ子にしない */
+	.cards a {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+		padding: 1rem 1.1rem 1.1rem;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: var(--radius);
+		background: var(--bg-subtle);
+		text-decoration: none;
+		color: inherit;
+	}
+	.cards a:hover {
+		border-color: var(--accent-light);
+	}
+
+	.title {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		color: rgb(var(--black));
+		font-weight: 700;
+	}
+	.cards a:hover .title {
+		color: var(--accent);
+	}
+
+	/* 矢印だけ動かす。カード自体は動かさず、行き先があることだけ示す */
+	.arrow {
+		color: var(--accent);
+		transition: transform 0.15s ease;
+	}
+	.cards a:hover .arrow {
+		transform: translateX(0.2rem);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.arrow {
+			transition: none;
+		}
+	}
+
+	.text {
+		color: rgb(var(--gray));
+		font-size: 0.85rem;
+		line-height: 1.6;
+	}
+</style>
