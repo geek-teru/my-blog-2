@@ -141,6 +141,23 @@ const choices = [
 			// ここで切っておかないと選択を動かすたびにページが動く
 			links[next].focus({ preventScroll: true });
 		});
+
+		/*
+		  ポインタが乗った行に焦点そのものを移す。
+
+		  見た目だけ塗り替えると、Enter の行き先はキーで選んだ行のままになり、
+		  光っている行と飛び先が食い違う。焦点を動かせば Enter は <a> の既定の
+		  動作でそのまま正しい行き先になる。
+
+		  ただし焦点がターミナルの外にあるときは動かさない。検索欄に入力中の
+		  ポインタの通過で焦点を奪ってしまうため。
+		*/
+		links.forEach((link) => {
+			link.addEventListener('mouseenter', () => {
+				if (!term.contains(document.activeElement)) return;
+				link.focus({ preventScroll: true });
+			});
+		});
 	}
 
 	setupTerminal();
@@ -308,7 +325,7 @@ const choices = [
 		font-weight: 700;
 	}
 	.menu a:hover .key,
-	.menu a:focus-visible .key {
+	.menu ul:not(:hover) a:focus-visible .key {
 		color: var(--accent);
 	}
 	.menu .text {
