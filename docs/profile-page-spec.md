@@ -82,16 +82,24 @@ Echo、CloudWatch Logs の13個が該当する。
 Simple Icons のパスは `fill="currentColor"` なので、チップ側で `color` を指定すれば色が付く。
 **`@iconify-json/simple-icons` に色の情報は入っていない**ため、色は `skills.ts` に直接持つ。
 
-入れてよいのは**公式の `simple-icons` パッケージで照合できた値だけ**とする。照合できなかった
-もの（Azure、Oracle）は空にして本文色を継がせる。**推測した hex を書かない。**
+**推測した hex は書かない。** 入れてよいのは公式の `simple-icons` パッケージで照合できた値だけ。
 
-AWS のサービスは一律で黒にする。サービスごとの公式色は照合する手段が無く、十数個の
-推測値を並べることになるため。Ansible と Jenkins も赤系が主張しすぎるので黒に落とす。
-公式色を外している行にはコメントで併記する。
+照合には2つの版を使い分ける。
 
-なお `@iconify-json/simple-icons`（3,732 個）と `simple-icons`（3,459 個）では収録数が
-ずれており、AWS 系・Slack・Azure・Oracle は後者に無い。**前者を上げたタイミングで
-アイコンが消える可能性がある**（astro-icon はビルドを落とすので気づける）。
+| 版 | 収録数 | 使いどころ |
+| --- | --- | --- |
+| 最新 | 3,459 | 通常のブランド色 |
+| v11 | 3,146 | AWS 系・Azure・Oracle。最新版では削除されているため |
+
+AWS のサービス色はカテゴリごとに決まっていて、v11 の値がそれを反映している。
+Compute 系がオレンジ、Networking 系が紫、Security 系が赤、Storage 系が緑、など。
+
+Ansible と Jenkins だけは公式色を外して黒にしている。赤系が主張しすぎるため。
+外している行にはコメントで公式色を併記する。
+
+なお `@iconify-json/simple-icons`（3,732 個）と `simple-icons` では収録数がずれており、
+AWS 系・Slack・Azure・Oracle は最新版に無い。**前者を上げたタイミングでアイコンが
+消える可能性がある**（astro-icon はビルドを落とすので気づける）。
 
 ## スタイル
 

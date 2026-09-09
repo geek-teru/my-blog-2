@@ -8,12 +8,15 @@
  * Simple Icons にロゴが無いもの（VPC、CloudTrail、Athena など13個）は、
  * 無理にそれらしいロゴを当てず省略してテキストで出す。
  *
- * `color` は省略すると本文色を継ぐ。入れてあるのは公式の simple-icons パッケージで
- * 照合できた値だけで、照合できなかったもの（Azure、Oracle）は空にしてある。
+ * `color` は省略すると本文色を継ぐ。**推測した hex は書かない。**
+ * 入れてあるのは公式の simple-icons パッケージで照合できた値だけ。
  *
- * AWS のサービスは一律で黒にしている。サービスごとの公式色は照合する手段が無く、
- * 十数個の推測値を並べることになるため。Ansible と Jenkins も赤系が主張しすぎるので
- * 黒に落としてある。公式色を外している行にはコメントで併記した。
+ * AWS 系・Azure・Oracle は最新版から削除されているので、収録のあった v11 から引いた。
+ * AWS のサービス色はカテゴリごとに決まっていて、v11 の値がそれを反映している
+ * （Compute 系がオレンジ、Networking 系が紫、Security 系が赤、など）。
+ *
+ * Ansible と Jenkins だけは公式色を外して黒にしている。赤系が主張しすぎるため。
+ * 外している行にはコメントで公式色を併記した。
  */
 export type Skill = {
 	/** チップに出す表示名 */
@@ -29,39 +32,36 @@ export type SkillGroup = {
 	items: Skill[];
 };
 
-/** AWS のサービスに共通で使う色 */
-const AWS = '#000000';
-
 export const skillGroups: SkillGroup[] = [
 	{
 		title: 'Infrastructure',
 		items: [
-			{ name: 'AWS', icon: 'amazonwebservices', color: AWS }, // 公式は #FF9900
-			{ name: 'Azure', icon: 'microsoftazure' },
+			{ name: 'AWS', icon: 'amazonwebservices', color: '#232F3E' },
+			{ name: 'Azure', icon: 'microsoftazure', color: '#0078D4' },
 			{ name: 'Google Cloud', icon: 'googlecloud', color: '#4285F4' },
 			{ name: 'vSphere', icon: 'vmware', color: '#607078' },
 			{ name: 'Terraform', icon: 'terraform', color: '#844FBA' },
 			{ name: 'Ansible', icon: 'ansible', color: '#000000' }, // 公式は #EE0000
 			{ name: 'VPC' },
-			{ name: 'Route 53', icon: 'amazonroute53', color: AWS },
-			{ name: 'ALB', icon: 'awselasticloadbalancing', color: AWS },
-			{ name: 'ECS', icon: 'amazonecs', color: AWS },
-			{ name: 'Lambda', icon: 'awslambda', color: AWS },
+			{ name: 'Route 53', icon: 'amazonroute53', color: '#8C4FFF' },
+			{ name: 'ALB', icon: 'awselasticloadbalancing', color: '#8C4FFF' },
+			{ name: 'ECS', icon: 'amazonecs', color: '#FF9900' },
+			{ name: 'Lambda', icon: 'awslambda', color: '#FF9900' },
 			{ name: 'AWS Batch' },
-			{ name: 'API Gateway', icon: 'amazonapigateway', color: AWS },
-			{ name: 'Amplify', icon: 'awsamplify', color: AWS },
+			{ name: 'API Gateway', icon: 'amazonapigateway', color: '#FF4F8B' },
+			{ name: 'Amplify', icon: 'awsamplify', color: '#FF9900' },
 			{ name: 'Step Functions' },
 		],
 	},
 	{
 		title: 'Security',
 		items: [
-			{ name: 'IAM', icon: 'amazoniam', color: AWS },
+			{ name: 'IAM', icon: 'amazoniam', color: '#DD344C' },
 			{ name: 'CloudTrail' },
 			{ name: 'Config' },
 			{ name: 'AWS WAF' },
 			{ name: 'Network Firewall' },
-			{ name: 'Cognito', icon: 'amazoncognito', color: AWS },
+			{ name: 'Cognito', icon: 'amazoncognito', color: '#DD344C' },
 		],
 	},
 	{
@@ -69,10 +69,10 @@ export const skillGroups: SkillGroup[] = [
 		items: [
 			{ name: 'MySQL', icon: 'mysql', color: '#4479A1' },
 			{ name: 'PostgreSQL', icon: 'postgresql', color: '#4169E1' },
-			{ name: 'Oracle', icon: 'oracle' },
-			{ name: 'RDS', icon: 'amazonrds', color: AWS },
-			{ name: 'Redshift', icon: 'amazonredshift', color: AWS },
-			{ name: 'S3', icon: 'amazons3', color: AWS },
+			{ name: 'Oracle', icon: 'oracle', color: '#F80000' },
+			{ name: 'RDS', icon: 'amazonrds', color: '#527FFF' },
+			{ name: 'Redshift', icon: 'amazonredshift', color: '#8C4FFF' },
+			{ name: 'S3', icon: 'amazons3', color: '#569A31' },
 			{ name: 'Athena' },
 			{ name: 'Glue' },
 			{ name: 'PySpark', icon: 'apachespark', color: '#E25A1C' },
@@ -104,7 +104,7 @@ export const skillGroups: SkillGroup[] = [
 		title: 'Monitoring / Logs',
 		items: [
 			{ name: 'Datadog', icon: 'datadog', color: '#632CA6' },
-			{ name: 'CloudWatch', icon: 'amazoncloudwatch', color: AWS },
+			{ name: 'CloudWatch', icon: 'amazoncloudwatch', color: '#FF4F8B' },
 			{ name: 'CloudWatch Logs' },
 			{ name: 'Fluentd', icon: 'fluentd', color: '#0E83C8' },
 		],
