@@ -9,7 +9,7 @@ const choices = [
 ];
 ---
 
-<div class="term" data-term tabindex="0" role="group" aria-label="サイトの案内">
+<div class="term" data-term>
 	<div class="bar" aria-hidden="true">
 		<span class="dots"><i></i><i></i><i></i></span>
 		<span class="path">~/blog</span>
@@ -26,7 +26,7 @@ const choices = [
 				Astro+Vercel で構築しています。
 			</p>
 
-			<nav class="menu" aria-label="サイト内の主なページ" data-menu>
+			<nav class="menu" aria-label="サイト内の主なページ">
 				<ul>
 					{
 						choices.map((choice) => (
@@ -97,71 +97,7 @@ const choices = [
 		setTimeout(step, 400);
 	}
 
-	/**
-	 * 選択肢を上下キーで移動できるようにする。
-	 *
-	 * 動かしているのは DOM の焦点そのもの。Enter は <a> の既定の動作が
-	 * そのまま働くので、こちらでは何もしていない。
-	 *
-	 * ページのスクロールとは切り離してある。キーの既定の動作を止めるだけでは
-	 * 足りず、focus() 側の自動スクロールも切る必要がある。
-	 *
-	 * キーを拾うのは焦点がターミナルの中にあるときだけ。ページ全体で拾うと
-	 * 上下キーでのスクロールを奪ってしまう。
-	 *
-	 * 枠に tabindex を付けてあるので、カードをクリックするか Tab で入れば
-	 * 行を選ばないうちから上下キーが効く。
-	 */
-	function setupMenu() {
-		const term = document.querySelector<HTMLElement>('[data-term]');
-		const menu = document.querySelector<HTMLElement>('[data-menu]');
-		if (!term || !menu) return;
-
-		const links = Array.from(menu.querySelectorAll('a'));
-		if (links.length === 0) return;
-
-		term.addEventListener('keydown', (event) => {
-			const current = links.indexOf(document.activeElement as HTMLAnchorElement);
-
-			// current が -1 なのは、まだ行を選んでいない状態（ターミナルの枠に焦点がある）。
-			// 下キーなら既定の profile から、上キーなら末尾から入る
-			let next: number;
-			if (event.key === 'ArrowDown') {
-				next = current === -1 ? 0 : (current + 1) % links.length;
-			} else if (event.key === 'ArrowUp') {
-				next = current === -1 ? links.length - 1 : (current - 1 + links.length) % links.length;
-			} else {
-				return;
-			}
-
-			// 上下キーの既定の動作（スクロール）を止める
-			event.preventDefault();
-
-			// focus() は既定で対象を画面内に送り込む。preventDefault では止まらないので、
-			// ここで切っておかないと選択を動かすたびにページが動く
-			links[next].focus({ preventScroll: true });
-		});
-
-		/*
-		  ポインタが乗った行に焦点そのものを移す。
-
-		  見た目だけ塗り替えると、Enter の行き先はキーで選んだ行のままになり、
-		  光っている行と飛び先が食い違う。焦点を動かせば Enter は <a> の既定の
-		  動作でそのまま正しい行き先になる。
-
-		  ただし焦点がターミナルの外にあるときは動かさない。検索欄に入力中の
-		  ポインタの通過で焦点を奪ってしまうため。
-		*/
-		links.forEach((link) => {
-			link.addEventListener('mouseenter', () => {
-				if (!term.contains(document.activeElement)) return;
-				link.focus({ preventScroll: true });
-			});
-		});
-	}
-
 	setupTerminal();
-	setupMenu();
 </script>
 
 <style>
@@ -170,11 +106,6 @@ const choices = [
 		border-radius: var(--radius);
 		overflow: hidden;
 		background: var(--bg);
-	}
-	/* キーボードで入ってきたときだけ枠を示す。クリックでは出さない */
-	.term:focus-visible {
-		outline: 2px solid var(--accent);
-		outline-offset: 2px;
 	}
 
 	/* 窓の上端。ネイビーにしてヘッダーと同じ世界のものに見せる */
@@ -285,11 +216,11 @@ const choices = [
 	  選択中の行の決め方。上から順に強い。
 
 	  1. ポインタが乗っている行
-	  2. 焦点がある行（ポインタがリストの外にあるときだけ）
+	  2. 焦点がある行（Tab で辿ってきたとき。ポインタがリストの外にあるときだけ）
 	  3. どちらも無ければ先頭の profile
 
 	  2 に :not(:hover) を付けてあるのが要で、これが無いと
-	  「キーで選んだ行」と「マウスで指した行」の両方が光って二重に見える。
+	  「Tab で辿った行」と「マウスで指した行」の両方が光って二重に見える。
 	*/
 	.marker {
 		color: var(--accent);
