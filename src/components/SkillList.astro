@@ -3,16 +3,22 @@ import { Icon } from 'astro-icon/components';
 import { skillGroups } from '../data/skills';
 ---
 
-<div class="grid">
+<div class="groups">
 	{
 		skillGroups.map((group) => (
-			<section class="card">
+			<section class="group">
 				<h3>{group.title}</h3>
 				<ul>
 					{group.items.map((skill) => (
 						<li class="chip">
 							{/* ロゴが無いスキルはテキストだけになる。高さと余白は変えない */}
-							{skill.icon && <Icon name={`simple-icons:${skill.icon}`} style={skill.color ? `color: ${skill.color}` : undefined} aria-hidden="true" />}
+							{skill.icon && (
+								<Icon
+									name={`simple-icons:${skill.icon}`}
+									style={skill.color ? `color: ${skill.color}` : undefined}
+									aria-hidden="true"
+								/>
+							)}
 							<span>{skill.name}</span>
 						</li>
 					))}
@@ -23,23 +29,26 @@ import { skillGroups } from '../data/skills';
 </div>
 
 <style>
-	.grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-		gap: 1rem;
+	/*
+	  カードで囲わず、見出しとチップの並びだけで区切る。
+	  枠を持たないぶん、区切りは見出しの字面と行間で作る。
+	*/
+	.groups {
+		display: flex;
+		flex-direction: column;
+		gap: 1.9rem;
 	}
 
-	.card {
-		padding: 1.1rem 1.2rem 1.3rem;
-		border: 1px solid rgb(var(--gray-light));
-		border-radius: var(--radius);
-		background: var(--bg-subtle);
+	/* トップの「最近の記事」と同じ、控えめな見出しの体裁に合わせる */
+	.group h3 {
+		margin: 0 0 0.75rem;
+		font-size: 0.85rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		color: rgb(var(--gray));
 	}
-	.card h3 {
-		margin: 0 0 0.9rem;
-		font-size: 0.95rem;
-	}
-	.card ul {
+
+	.group ul {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.45rem;
@@ -55,7 +64,8 @@ import { skillGroups } from '../data/skills';
 		padding: 0.3rem 0.6rem;
 		border: 1px solid rgb(var(--gray-light));
 		border-radius: 999px;
-		background: var(--bg);
+		/* 地が白になったので、チップ側を薄く塗って形を出す */
+		background: var(--bg-subtle);
 		color: rgb(var(--gray-dark));
 		font-size: 0.82rem;
 		line-height: 1.4;
