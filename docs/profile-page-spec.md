@@ -42,21 +42,19 @@ export type SkillGroup = {
 export const skillGroups: SkillGroup[] = [ /* ... */ ];
 ```
 
-### カテゴリの初期値
-
-`content/career/` の記述と記事のタグから拾ったもの。インフラ／SRE を先頭に置き、
-フロントエンドを後ろにする。参考ページはフロントエンド始まりだが、経歴が違うので順番を変える。
+### カテゴリ
 
 | カテゴリ | 中身 |
 | --- | --- |
-| クラウド / インフラ | AWS, Google Cloud, vSphere, Nginx, Apache |
-| IaC / CI/CD | Terraform, Ansible, GitHub Actions, Jenkins |
-| 監視 / 運用 | Datadog, Fluentd, CloudWatch |
-| バックエンド / DB | Java, Ruby, PostgreSQL, Supabase |
-| フロントエンド | Next.js, React, TypeScript |
-| ツール | Git, GitHub, Docker, WSL, Slack |
+| インフラ | AWS, Azure, Google Cloud, vSphere, Terraform, Ansible, VPC, Route 53, ALB, ECS, Lambda, AWS Batch, API Gateway, Amplify, Step Functions |
+| セキュリティ | IAM, CloudTrail, Config, AWS WAF, Network Firewall, Cognito |
+| Database / Data Platform | MySQL, PostgreSQL, Oracle, RDS, Redshift, S3, Athena, Glue, PySpark, QuickSight |
+| Tools / CI/CD | Git, GitHub, GitHub Actions, Jenkins, CodeBuild, Docker |
+| Backend | Go, PHP, Python, Echo, Laravel |
+| Monitoring / Logs | Datadog, CloudWatch, CloudWatch Logs, Fluentd |
 
-中身は後から `skills.ts` を編集すれば増減できる。ページ側は配列を舐めるだけにする。
+全46項目のうち **ロゴがあるのは33個、残る13個はテキストだけのチップ**になる。
+中身は `skills.ts` を編集すれば増減できる。ページ側は配列を舐めるだけにする。
 
 ## アイコン
 
@@ -71,22 +69,29 @@ CDN から読む方式とアイコンフォントは採らない。リクエス�
 
 ### ロゴが無いものの扱い
 
-**Simple Icons に全スキルのロゴがあるわけではない。** vSphere、Blue/Green デプロイ、監視設計、
-REST API などは存在しない。
+**Simple Icons に全スキルのロゴがあるわけではない。** VPC、AWS Batch、Step Functions、
+CloudTrail、Config、AWS WAF、Network Firewall、Athena、Glue、QuickSight、CodeBuild、
+Echo、CloudWatch Logs の13個が該当する。
 
-`icon` を省略したら**テキストだけのチップ**にフォールバックする。チップの高さと余白はアイコン有無で
-変えないので、混在しても行が揃う。「アイコンが無いから載せない」という判断はしない。
+`icon` を省略したら**テキストだけのチップ**にフォールバックする。チップの高さと余白は
+アイコン有無で変えないので、混在しても行が揃う。「アイコンが無いから載せない」という
+判断はしない。実務の中心にあるものほど、この判断で抜け落ちる。
 
 ### 色
 
 Simple Icons のパスは `fill="currentColor"` なので、チップ側で `color` を指定すれば色が付く。
-**`@iconify-json/simple-icons` に色の情報は入っていない**ため、ブランドカラーは `skills.ts` に直接持つ。
+**`@iconify-json/simple-icons` に色の情報は入っていない**ため、色は `skills.ts` に直接持つ。
 
-公式の `simple-icons` パッケージから引くことも試したが、AWS・CloudWatch・Slack は
-新しい版で削除されており（商標方針による）色が引けなかった。アイコン本体を持つ
-`@iconify-json` 側とは収録数がずれるので、パッケージには依存させない。
+入れてよいのは**公式の `simple-icons` パッケージで照合できた値だけ**とする。照合できなかった
+もの（Azure、Oracle）は空にして本文色を継がせる。**推測した hex を書かない。**
 
-`color` を省略したスキルは本文色を継ぐ。
+AWS のサービスは一律で黒にする。サービスごとの公式色は照合する手段が無く、十数個の
+推測値を並べることになるため。Ansible と Jenkins も赤系が主張しすぎるので黒に落とす。
+公式色を外している行にはコメントで併記する。
+
+なお `@iconify-json/simple-icons`（3,732 個）と `simple-icons`（3,459 個）では収録数が
+ずれており、AWS 系・Slack・Azure・Oracle は後者に無い。**前者を上げたタイミングで
+アイコンが消える可能性がある**（astro-icon はビルドを落とすので気づける）。
 
 ## スタイル
 
