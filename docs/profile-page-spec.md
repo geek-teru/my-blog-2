@@ -42,21 +42,19 @@ export type SkillGroup = {
 export const skillGroups: SkillGroup[] = [ /* ... */ ];
 ```
 
-### カテゴリの初期値
-
-`content/career/` の記述と記事のタグから拾ったもの。インフラ／SRE を先頭に置き、
-フロントエンドを後ろにする。参考ページはフロントエンド始まりだが、経歴が違うので順番を変える。
+### カテゴリ
 
 | カテゴリ | 中身 |
 | --- | --- |
-| クラウド / インフラ | AWS, Google Cloud, vSphere, Nginx, Apache |
-| IaC / CI/CD | Terraform, Ansible, GitHub Actions, Jenkins |
-| 監視 / 運用 | Datadog, Fluentd, CloudWatch |
-| バックエンド / DB | Java, Ruby, PostgreSQL, Supabase |
-| フロントエンド | Next.js, React, TypeScript |
-| ツール | Git, GitHub, Docker, WSL, Slack |
+| Infrastructure | AWS, Azure, Google Cloud, vSphere, Terraform, Ansible, VPC, Route 53, ALB, ECS, Lambda, AWS Batch, API Gateway, Amplify, Step Functions |
+| Database / Data Platform | MySQL, PostgreSQL, Oracle, RDS, Redshift, S3, Athena, Glue, Kinesis, PySpark, QuickSight |
+| Backend | Go, PHP, Python, Echo, Laravel |
+| Security | IAM, CloudTrail, Config, AWS WAF, Network Firewall, Cognito |
+| Tools / CI/CD | Git, GitHub, GitHub Actions, Jenkins, CodeBuild, Docker |
+| Monitoring / Logs | Datadog, CloudWatch, CloudWatch Logs, Fluentd |
 
-中身は後から `skills.ts` を編集すれば増減できる。ページ側は配列を舐めるだけにする。
+全47項目のうち **ロゴがあるのは33個、残る14個はテキストだけのチップ**になる。
+中身は `skills.ts` を編集すれば増減できる。ページ側は配列を舐めるだけにする。
 
 ## アイコン
 
@@ -71,31 +69,50 @@ CDN から読む方式とアイコンフォントは採らない。リクエス�
 
 ### ロゴが無いものの扱い
 
-**Simple Icons に全スキルのロゴがあるわけではない。** vSphere、Blue/Green デプロイ、監視設計、
-REST API などは存在しない。
+**Simple Icons に全スキルのロゴがあるわけではない。** VPC、AWS Batch、Step Functions、
+CloudTrail、Config、AWS WAF、Network Firewall、Athena、Glue、Kinesis、QuickSight、
+CodeBuild、Echo、CloudWatch Logs の14個が該当する。
 
-`icon` を省略したら**テキストだけのチップ**にフォールバックする。チップの高さと余白はアイコン有無で
-変えないので、混在しても行が揃う。「アイコンが無いから載せない」という判断はしない。
+`icon` を省略したら**テキストだけのチップ**にフォールバックする。チップの高さと余白は
+アイコン有無で変えないので、混在しても行が揃う。「アイコンが無いから載せない」という
+判断はしない。実務の中心にあるものほど、この判断で抜け落ちる。
 
 ### 色
 
 Simple Icons のパスは `fill="currentColor"` なので、チップ側で `color` を指定すれば色が付く。
-**`@iconify-json/simple-icons` に色の情報は入っていない**ため、ブランドカラーは `skills.ts` に直接持つ。
+**`@iconify-json/simple-icons` に色の情報は入っていない**ため、色は `skills.ts` に直接持つ。
 
-公式の `simple-icons` パッケージから引くことも試したが、AWS・CloudWatch・Slack は
-新しい版で削除されており（商標方針による）色が引けなかった。アイコン本体を持つ
-`@iconify-json` 側とは収録数がずれるので、パッケージには依存させない。
+**推測した hex は書かない。** 入れてよいのは公式の `simple-icons` パッケージで照合できた値だけ。
 
-`color` を省略したスキルは本文色を継ぐ。
+照合には2つの版を使い分ける。
+
+| 版 | 収録数 | 使いどころ |
+| --- | --- | --- |
+| 最新 | 3,459 | 通常のブランド色 |
+| v11 | 3,146 | AWS 系・Azure・Oracle。最新版では削除されているため |
+
+AWS のサービス色はカテゴリごとに決まっていて、v11 の値がそれを反映している。
+Compute 系がオレンジ、Networking 系が紫、Security 系が赤、Storage 系が緑、など。
+
+Ansible と Jenkins だけは公式色を外して黒にしている。赤系が主張しすぎるため。
+外している行にはコメントで公式色を併記する。
+
+なお `@iconify-json/simple-icons`（3,732 個）と `simple-icons` では収録数がずれており、
+AWS 系・Slack・Azure・Oracle は最新版に無い。**前者を上げたタイミングでアイコンが
+消える可能性がある**（astro-icon はビルドを落とすので気づける）。
 
 ## スタイル
 
 `global.css` の既存トークンだけで組む。**新しい色は足さない。**
 
-- カードのグリッド: `repeat(auto-fit, minmax(16rem, 1fr))`、`--shell` のレール内
-- カード: 背景 `--bg-subtle` / 枠 `1px solid rgb(var(--gray-light))` / 角丸 `--radius`
-- チップ: `display: inline-flex`、アイコンは `1em` 角、ラベルとの間隔は `0.35rem`
-- モバイル（1列）まで `auto-fit` で自然に落ちるので、メディアクエリは原則書かない
+**カードで囲わない。** 見出しとチップの並びだけで区切り、段組みもしない。
+カードにすると枠が6つ並んで、中身のチップより枠のほうが目立つ。
+
+- カテゴリ: 縦に積む。間隔は `1.9rem`
+- 見出し: トップの「最近の記事」と同じ体裁（`0.85rem` / `700` / 字間 `0.12em` / `--gray`）
+- チップ: `display: inline-flex`、アイコンは `1em` 角、ラベルとの間隔は `0.35rem`。
+  地が白なので背景に `--bg-subtle` を敷いて形を出す
+- 横幅いっぱいにチップが流れるので、メディアクエリは書かない
 
 ダークモード対応は現状サイトに無いので、今回も入れない。
 

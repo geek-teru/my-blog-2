@@ -1,22 +1,12 @@
 ---
 import Layout from '../layouts/BlogPost.astro';
 import ProfileHeader from '../components/ProfileHeader.astro';
-import SkillGrid from '../components/SkillGrid.astro';
+import SkillList from '../components/SkillList.astro';
 ---
 
 <Layout title="Profile" description="Teru のプロフィールとスキル">
 	<ProfileHeader />
 
 	<h2>スキル</h2>
-	<SkillGrid />
-
-	<p class="career-link">
-		これまでの案件と時期は <a href="/career">Career</a> にまとめています。
-	</p>
+	<SkillList />
 </Layout>
-
-<style>
-	.career-link {
-		margin-top: 1.5rem;
-	}
-</style>
