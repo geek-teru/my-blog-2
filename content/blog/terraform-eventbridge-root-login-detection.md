@@ -1,6 +1,6 @@
 ---
 title: "Terraform で リスクイベントを検知する仕組みを作ってみた"
-description: "root のログインや CloudTrail の停止など、起きたら即知りたい4つの操作を EventBridge で拾って Slack に流す構成を Terraform で書く。Lambda を使わずに組むときの引っかかりどころまで。"
+description: "root のログインなど、起きたら即知りたい4つの操作を EventBridge で拾って Slack に流す構成を Terraform で書く。"
 pubDate: 2026-09-08
 tags: ["Terraform", "AWS", "EventBridge", "Slack", "セキュリティ"]
 draft: false

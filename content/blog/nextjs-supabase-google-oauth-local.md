@@ -1,6 +1,6 @@
 ---
 title: "Supabase のローカル環境で Google ログインを実装"
-description: "クラウドのプロジェクトを作らず、Docker で動く Supabase のローカル環境だけで Google OAuth ログインを通す。config.toml の設定から profiles の自動生成トリガーまで一通り。"
+description: "Docker で動く Supabase のローカル環境だけで Google OAuth ログインを通す。profiles の自動生成トリガーまで。"
 pubDate: 2026-08-30
 tags: ["Next.js", "Supabase", "認証", "Docker"]
 draft: false
