@@ -1,6 +1,6 @@
 ---
 title: "Next.js 16 の Middleware でルート保護を実装してみた"
-description: "前回、Next.js 16 と Supabase で Google ログインを実装しました（前回の記事）。"
+description: "認証チェックを Middleware の1箇所に寄せて、未ログインを /login に飛ばす。ログアウトは Server Action で作る。"
 pubDate: 2026-08-31
 tags: ["Next.js", "Supabase", "認証", "Middleware"]
 draft: true

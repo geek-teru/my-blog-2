@@ -1,6 +1,6 @@
 ---
 title: "ローカルのTerraform実行環境が古すぎたので整備した"
-description: "required_version と .terraform-version でバージョンを二重に固定して、WSL に tenv を入れる。リポジトリに入っただけで正しい Terraform に切り替わる状態を作るまでの手順。"
+description: "WSL に tenv を入れ、required_version と .terraform-version で二重に固定する。リポジトリに入るだけで切り替わる状態に。"
 pubDate: 2026-09-05
 tags: ["Terraform", "tenv", "WSL", "IaC"]
 draft: false
