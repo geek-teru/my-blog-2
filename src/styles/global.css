@@ -277,10 +277,16 @@ input {
 	--rail-col: 1.2rem; /* 線と丸が入る列の幅 */
 	--gap: 1rem; /* 列と本文の間 */
 	--dot: 0.85rem;
+	/*
+	  行の上端から丸の上端まで。本文1行目の高さに丸を合わせるための値。
+	  丸の上端・下端を欲しがる側（線の始点、線を消し込む帯）がここを見るので、
+	  直値で持たずに変数にしてある。
+	*/
+	--dot-top: 0.32rem;
 
 	/*
 	  線と丸の色。使う側が意味を持たせたいときだけ上書きする。
-	  Career では進行中のブランチを水色にするために差し替えている。
+	  Career では所属の期ごとに色を変えるために差し替えている。
 	  色を直値で焼き込むと、区別を足したくなった時点でスタイルごと
 	  複製することになるので、最初から変数で外に出しておく。
 	*/
@@ -333,7 +339,7 @@ input {
 	box-sizing: border-box;
 	width: var(--dot);
 	height: var(--dot);
-	margin-top: 0.32rem;
+	margin-top: var(--dot-top);
 	border: 2px solid var(--dot-color);
 	border-radius: 999px;
 	background: var(--bg);

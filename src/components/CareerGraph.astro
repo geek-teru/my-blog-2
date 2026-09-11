@@ -4,7 +4,7 @@ import { getCareerBranches } from '../lib/career';
 
 const branches = await getCareerBranches();
 
-// 業務詳細は Markdown 本文なので、描画用のコンポーネントを先に作っておく。
+// 担当領域は Markdown 本文なので、描画用のコンポーネントを先に作っておく。
 // 本文が空のもの（節目や、詳細を書いていない案件）には作らない。
 const graph = await Promise.all(
 	branches.map(async (branch) => ({
@@ -50,12 +50,9 @@ const graph = await Promise.all(
 								)}
 
 								{Details && (
-									<details>
-										<summary>業務詳細</summary>
-										<div class="detail-body">
-											<Details />
-										</div>
-									</details>
+									<div class="detail-body">
+										<Details />
+									</div>
 								)}
 							</div>
 						</li>
@@ -80,14 +77,19 @@ const graph = await Promise.all(
 		  トップは先頭に main のラベルが来るぶん、既定値のままでよい。
 		*/
 		--rail-top: 0.74rem;
-	}
-	/*
-	  進行中の期だけ水色にする。共通スタイルが色を変数で持っているので、
-	  ここで差し替えるだけで済み、線や丸の指定を複製する必要がない。
-	*/
-	.branch.active {
+
+		/*
+		  期ごとに線と丸の色を変える。共通スタイルが色を変数で持っているので、
+		  ここで差し替えるだけで済み、線や丸の指定を複製する必要がない。
+		  過ぎた期（SIer 時代）は水色。
+		*/
 		--rail-color: var(--accent-light);
 		--dot-color: var(--accent-light);
+	}
+	/* 進行中の期（フリーランス時代）は濃い青にして、いまここを目立たせる */
+	.branch.active {
+		--rail-color: var(--accent);
+		--dot-color: var(--accent);
 	}
 
 	.commits > li {
@@ -129,6 +131,13 @@ const graph = await Promise.all(
 	/* 節目の丸は塗りつぶす。色はその期の色に従う */
 	.milestone .dot {
 		background: var(--dot-color);
+		/*
+		  下の ::after（線を消し込む帯）は position: absolute なので、
+		  何もしないと静的配置のこの丸より手前に描かれ、縁を削ってしまう。
+		  重ね順を明示して、帯が丸に乗らないようにする。
+		*/
+		position: relative;
+		z-index: 1;
 	}
 	/*
 	  節目より下に線を伸ばさない。節目はその期の始まりなので、線が続いていると
@@ -138,7 +147,11 @@ const graph = await Promise.all(
 	.milestone::after {
 		content: '';
 		position: absolute;
-		top: 1.15rem;
+		/*
+		  丸の下端ちょうどから始める。手前から始めると帯が丸の下側に乗り、
+		  輪郭が少し欠けて見える。
+		*/
+		top: calc(var(--dot-top) + var(--dot));
 		bottom: -1px;
 		left: calc(var(--rail-col) / 2 - 1px);
 		width: 2px;
@@ -152,51 +165,14 @@ const graph = await Promise.all(
 		line-height: 1.6;
 	}
 
-	details {
-		margin-top: 1rem;
-		border: 1px solid rgb(var(--gray-light));
-		border-radius: var(--radius);
-		background: var(--bg-subtle);
-	}
-	summary {
-		padding: 0.55rem 0.9rem;
-		color: rgb(var(--gray-dark));
-		font-size: 0.85rem;
-		font-weight: 700;
-		cursor: pointer;
-		list-style: none;
-	}
-	/* 既定の三角を消して、自前の印を左に置く */
-	summary::-webkit-details-marker {
-		display: none;
-	}
-	summary::before {
-		content: '▸';
-		display: inline-block;
-		margin-right: 0.5em;
-		color: rgb(var(--gray));
-		transition: transform 0.15s ease;
-	}
-	details[open] > summary::before {
-		transform: rotate(90deg);
-	}
-	summary:hover {
-		color: var(--accent);
-	}
+	/* 担当領域の箇条書き。概要のすぐ下に続けて並べる */
 	.detail-body {
-		padding: 0.2rem 0.9rem 1rem;
+		margin-top: 0.5rem;
 	}
 	/*
-	  業務詳細は Markdown から描かれるので、スコープ用の属性が付かない。
+	  ここは Markdown から描かれるので、スコープ用の属性が付かない。
 	  :global でスコープを抜けないと、ここの指定は一切当たらない。
 	*/
-	.detail-body :global(h3) {
-		margin: 1.1rem 0 0.4rem;
-		font-size: 0.88rem;
-	}
-	.detail-body :global(> :first-child) {
-		margin-top: 0;
-	}
 	.detail-body :global(ul) {
 		margin: 0;
 		padding-left: 1.2em;
@@ -214,11 +190,5 @@ const graph = await Promise.all(
 	*/
 	.branch + .branch {
 		margin-top: 1.6rem;
-	}
-
-	@media (max-width: 34rem) {
-		.detail-body {
-			padding: 0.2rem 0.7rem 0.9rem;
-		}
 	}
 </style>
