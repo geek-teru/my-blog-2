@@ -5,7 +5,14 @@ import { z } from 'astro/zod';
 const blog = defineCollection({
 	// 記事はプロジェクトルート直下の `content/blog/` に置く。src/ の外に出しているのは、
 	// ここを後で別リポジトリ（記事リポジトリ）のマウント先にするため（docs/blog-spec.md 4節）。
-	loader: glob({ base: './content/blog', pattern: '**/*.{md,mdx}' }),
+	loader: glob({
+		base: './content/blog',
+		pattern: '**/*.{md,mdx}',
+		// ファイル名の先頭の連番は、エディタで日付順に並べるためのもの。
+		// URL には出さない（001_foo.md -> /blog/foo/）。公開済みの記事の
+		// URL を変えないため。番号を URL にも出したくなったらこの行を消す。
+		generateId: ({ entry }) => entry.replace(/\.[^.]+$/, '').replace(/^\d+_/, ''),
+	}),
 	// Type-check frontmatter using a schema
 	schema: ({ image }) =>
 		z.object({
