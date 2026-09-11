@@ -18,31 +18,28 @@ Supabase CLI が コンテナで認証サーバーごと立ち上げてくれる
 
 この記事では、Supabase のローカル環境で Google OAuth ログインを実装してログイン成功までやってみます。
 
-## Supabase のローカル環境とは
+## Supabase とは
 
-Supabase CLI が Docker コンテナ一式を立ち上げて、クラウド版とほぼ同じものを手元に再現する仕組みです。
+Postgres を中心に、認証・API・ストレージをひとまとめにして提供する BaaS です。オープンソースの Firebase 代替として作られていて、テーブルを用意すれば REST API が自動で生え、認証もそこに乗ります。
 
-`npx supabase start` を叩くと12個のコンテナが立ちます。
+その一式は Supabase CLI で手元に再現できます。`npx supabase start` を叩くと、Docker コンテナが12個立ちます。
 
 ```
 db / auth / rest / realtime / storage / studio / kong /
 inbucket(メール受信箱) / pg_meta / edge_runtime / vector / analytics
 ```
 
-Supabase は Postgres 単体ではなく、Postgres の周りに認証・API・ストレージを束ねた集合体だとわかります。認証を担当しているのは `auth` コンテナ（GoTrue）で、今回いじる設定はほぼここに効きます。
+今回の主役は、認証を担当する `auth` コンテナ（GoTrue）です。
 
-ローカルでやる利点は2つです。
-
-- **壊してもやり直せる。** `supabase db reset` でマイグレーションを流し直せる
-- **設定がファイルに残る。** クラウドの管理画面でポチポチした設定と違い、`supabase/config.toml` がそのまま構成になる
+ローカルでやる利点は、設定がファイルに残ることです。クラウドの管理画面でポチポチした設定と違い、`supabase/config.toml` がそのまま構成になります。
 
 管理画面（Studio）は `http://127.0.0.1:54323`、API は `54321` 番で待ち受けます。認証の窓口もこの `54321` なので、**Google Cloud Console に登録するリダイレクト URI は `http://127.0.0.1:54321/auth/v1/callback`** になります。アプリを動かす 3000 番ではありません。
 
 ## @supabase/ssr とは
 
-サーバー側でも Supabase のセッションを扱えるようにする公式ライブラリです。
+Next.js のサーバー側でも Supabase のセッションを扱えるようにする公式ライブラリです。Server Component / Server Action / Route Handler / Middleware など、ブラウザの外で動くコードがこれにあたります。
 
-素の `supabase-js` はブラウザ前提で、セッションを localStorage に置きます。それだとサーバー側からは読めません。`@supabase/ssr` はセッションを **Cookie** に置くので、Server Component からも Middleware からも同じセッションを見られます。
+素の `supabase-js` はブラウザ前提で、セッションを localStorage に置きます。ブラウザの外からは localStorage が見えないので、そのままではログイン済みかどうかも判断できません。`@supabase/ssr` はセッションを **Cookie** に置くので、Server Component からも Middleware からも同じセッションを見られます。
 
 大事なのは、**実行場所ごとにクライアントを作り分ける必要がある**ことです。整理のためではなく、分けないと動きません。
 
@@ -200,7 +197,7 @@ Supabase の認証情報は `auth.users` に入ります。
 npx supabase migration new create_profiles
 ```
 
-ポイントは、**行の作成をアプリではなく DB のトリガーに任せた**ことです。
+ポイントは、**profilesの登録をアプリではなく DB のトリガーに任せた**ことです。
 これは賛否ありそうな実装です。
 
 メリットは、単一のトランザクションで実行されることです。ユーザーのログインとプロフィール登録は常にセットで実行されます。
