@@ -137,11 +137,16 @@ h6 {
 	scroll-margin-top: calc(var(--header-h) + 1.5rem);
 }
 
-/* 本文中の見出しは、前の節との間を空けて区切りを作る */
+/*
+  本文中の見出しは、前の節との間を空けて区切りを作る。
+  線は見出しの下に引く。上に引くと前の節の終わりに付いて見え、
+  どの見出しの線なのかが分かりにくい。
+*/
 .prose h2 {
 	margin-top: 3rem;
-	padding-top: 0.4rem;
-	border-top: 1px solid rgb(var(--gray-light));
+	margin-bottom: 1rem;
+	padding-bottom: 0.4rem;
+	border-bottom: 1px solid rgb(var(--gray-light));
 }
 .prose h3 {
 	margin-top: 2.2rem;
