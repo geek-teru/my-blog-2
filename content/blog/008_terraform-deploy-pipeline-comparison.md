@@ -3,7 +3,7 @@ title: "Terraform のデプロイ方式を3つ実装して比べてみた"
 description: "GitHub Actions, CodePipeline などを用いた3方式のメリデメを比較してみました"
 pubDate: 2026-09-14
 tags: ["GitHub Actions", "Terraform", "AWS", "CodePipeline", "CodeBuild"]
-heroImage: "./images/terraform.png"
+heroImage: "./images/github-actions.png"
 draft: false
 ---
 
