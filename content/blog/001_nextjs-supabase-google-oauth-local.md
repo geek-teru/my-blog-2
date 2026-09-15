@@ -4,7 +4,7 @@ description: "Docker で動く Supabase のローカル環境だけで Google OA
 pubDate: 2026-08-30
 tags: ["Next.js", "Supabase", "認証", "Docker"]
 heroImage: "./images/nextjs.png"
-draft: false
+draft: true
 ---
 
 ## はじめに

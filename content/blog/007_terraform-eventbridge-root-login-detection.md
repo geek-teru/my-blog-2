@@ -1,8 +1,8 @@
 ---
 title: "Terraform で リスクイベントを検知する仕組みを作ってみた"
-description: "root のログインなど、起きたら即知りたい4つの操作を EventBridge で拾って Slack に流す構成を Terraform で書く。"
+description: "root のログインなど、リスクとなりうるイベントを拾って Slack に通知する仕組みを実装します"
 pubDate: 2026-09-08
-tags: ["Terraform", "AWS", "EventBridge", "Slack", "セキュリティ"]
+tags: ["Terraform", "AWS", "EventBridge", "セキュリティ"]
 heroImage: "./images/terraform.png"
 draft: false
 ---
@@ -167,15 +167,13 @@ slack_team_id, slack_channel_idは一旦はGitHubシークレットに入れて�
 
 ### 6. 動作確認
 
-GitHub Actionsからterraform applyし、
-
-rootユーザーでログインしてみます。
-
-通知が飛んできました。
+GitHub Actionsからterraform applyし、rootユーザーでログインしてみます。
 
 ![通知](./images/screenshot-2026-09-08-182221.png)
 
+通知が飛んできました。
+
 ## まとめ
 
-- EventBridge → SNS → AWS Chatbot で、root ログインなどのリスクイベントを検知できる
-- 個人のAWSアカウントを安心して使えるように保護する参考にしていただければ幸いです。
+- EventBridge → SNS → AWS Chatbot で、root ログインなどのリスクイベントを検知できた。
+- 個人のAWSアカウントでも安心して使えるように保護しましょう！
