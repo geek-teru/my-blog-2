@@ -1,8 +1,8 @@
 ---
 title: "Terraform のデプロイ方式を3つ実装して比べてみた"
-description: "GitHub Actions・CodeBuild・CodePipeline の3方式で Terraform をデプロイし、違いを比べる。"
+description: "GitHub Actions, CodePipeline などを用いた3方式のメリデメを比較してみました"
 pubDate: 2026-09-14
-tags: ["Terraform", "AWS", "GitHub Actions", "CodePipeline", "CodeBuild"]
+tags: ["GitHub Actions", "Terraform", "AWS", "CodePipeline", "CodeBuild"]
 heroImage: "./images/terraform.png"
 draft: false
 ---

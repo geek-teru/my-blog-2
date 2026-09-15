@@ -1,8 +1,8 @@
 ---
 title: "Terraform で リスクイベントを検知する仕組みを作ってみた"
-description: "root のログインなど、起きたら即知りたい4つの操作を EventBridge で拾って Slack に流す構成を Terraform で書く。"
+description: "root のログインなど、リスクとなりうるイベントを拾って Slack に通知する仕組みを実装します"
 pubDate: 2026-09-08
-tags: ["Terraform", "AWS", "EventBridge", "Slack", "セキュリティ"]
+tags: ["Terraform", "AWS", "EventBridge", "セキュリティ"]
 heroImage: "./images/terraform.png"
 draft: false
 ---
