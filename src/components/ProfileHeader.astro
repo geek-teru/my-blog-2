@@ -90,10 +90,11 @@ import { PROFILE_MONOGRAM, SOCIAL_LINKS } from '../consts';
 	/*
 	  紹介文は複数段落あるので、.head の中央寄せから左寄せに戻す。
 	  和文を中央寄せのまま折り返すと行頭が揃わず読み出しにくい。
-	  1行が長くなりすぎないよう幅も抑える。
+	  align-items: center のままだと内容なりの幅で止まるので、
+	  stretch で本文欄の幅いっぱいに広げる。
 	*/
 	.bio {
-		max-width: 34rem;
+		align-self: stretch;
 		text-align: left;
 		color: rgb(var(--gray-dark));
 	}
