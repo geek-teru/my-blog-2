@@ -22,7 +22,17 @@ import { PROFILE_MONOGRAM, SOCIAL_LINKS } from '../consts';
 		}
 	</ul>
 
-	<p class="bio">プロフィール文は作成中です。</p>
+	<div class="bio">
+		<p>はじめまして。</p>
+		<p>フリーランスでインフラ・DevOps・バックエンドエンジニアをしている「てる」と申します。</p>
+		<p>1994年生まれ、横浜在住、大阪生まれ育ち。</p>
+		<p>学生時代にITの基礎やネットワークについて学び、新卒でSIerでインフラ系の部署にいました。</p>
+		<p>
+			現在はフリーランスエンジニアとして活動しております。<br />
+			某WebサービスのSREを3年程やったり、某インターネット広告企業でプロダクトの立ち上げをしたりしました。
+		</p>
+		<p>最近は某インターネットメディア企業にてクレジットカード決済のシステムのAWS移行案件をやっています。</p>
+	</div>
 </div>
 
 <style>
@@ -77,8 +87,20 @@ import { PROFILE_MONOGRAM, SOCIAL_LINKS } from '../consts';
 		height: 1.15rem;
 	}
 
+	/*
+	  紹介文は複数段落あるので、.head の中央寄せから左寄せに戻す。
+	  和文を中央寄せのまま折り返すと行頭が揃わず読み出しにくい。
+	  1行が長くなりすぎないよう幅も抑える。
+	*/
 	.bio {
-		margin: 0;
-		color: rgb(var(--gray));
+		max-width: 34rem;
+		text-align: left;
+		color: rgb(var(--gray-dark));
+	}
+	.bio p {
+		margin: 0 0 1em;
+	}
+	.bio p:last-child {
+		margin-bottom: 0;
 	}
 </style>
