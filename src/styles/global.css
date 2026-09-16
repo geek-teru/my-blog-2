@@ -19,6 +19,12 @@
 	--gray-dark: 46, 52, 64;
 	--bg: #ffffff;
 	--bg-subtle: #f7f8fa;
+	/*
+	  ページの地。コンテンツ（main）だけを白いカードにして、それ以外をこの色にする。
+	  --bg は「白い面の上で下を塗りつぶす」用途（コミットの丸など）でも使うので、
+	  地の色は別の変数に分けている。
+	*/
+	--page-bg: #eef6fc;
 
 	/* 現在地など「いまここ」を示す水色。--accent より明るくして印として目立たせる */
 	--accent-light: #3d9ae0;
@@ -38,12 +44,12 @@
 
 	/*
 	  ページの外枠。ヘッダー・パンくず・本文・フッターが共有する1本のレール。
-	  全ページ共通の定数にしている。ページごとに変えると、記事一覧へ移動した
-	  だけでロゴと検索窓が横に飛ぶ（実際にそうなっていた）。
+	  和文の読みやすい行長に合わせ、レールごとこの幅にしている。
+	  文章だけを狭めると、白いカードの右側に空きが残って左右非対称に見える。
+
+	  目次を横に並べる記事ページだけは、body.wide で広げる（下の body.wide 参照）。
 	*/
-	--shell: 64rem;
-	/* 和文の読みやすい行長。レールは狭めず、文章だけをこの幅に収める */
-	--measure: 44rem;
+	--shell: 44rem;
 	--radius: 8px;
 }
 
@@ -61,7 +67,7 @@ body {
 		sans-serif;
 	margin: 0;
 	padding: 0;
-	background: var(--bg);
+	background: var(--page-bg);
 	color: rgb(var(--gray-dark));
 	font-size: 17px;
 	line-height: 1.9;
@@ -76,27 +82,82 @@ body {
 	min-height: 100vh;
 }
 
+/*
+  コンテンツを白いカードにする。
+
+  左右の余白はカードの内側に取らず、レールの外へ張り出させる。内側に取ると
+  本文の左端がヘッダーのロゴやパンくずより右にずれ、レールで揃えている意味がなくなる。
+  content-box のまま width をレール幅にし、padding の分だけ外に広げている。
+
+  張り出し量 --card-pad は、レールの左右に 2.5rem ずつ余裕がある幅では 2.5rem、
+  それ未満ではレールの外側の余白と同じ 1.25rem にする（下の body の指定）。
+*/
 main {
 	flex: 1;
 	width: var(--shell);
 	max-width: calc(100% - 2.5rem);
-	margin: 0 auto;
-	padding: 3.5rem 0 5rem;
+	margin: 1.5rem auto 3rem;
+	padding: 3.5rem var(--card-pad) 5rem;
+	border-radius: var(--radius);
+	background: var(--bg);
 }
 
 /*
-  文章が主役のページは、レールの中で行長を --measure に収める。
-  レール自体は狭めない。狭めるとヘッダーやフッターまで一緒に動いてしまう。
-  左端はレールに揃えたままにするので、ロゴ・パンくず・本文の頭が
-  どのページでも同じ x に並ぶ。
+  目次を横に並べる記事ページだけ、レールを広げる。
+  44rem のまま目次（15rem）を横に置くと、本文が 25.5rem まで狭くなるため。
+  --shell は body で差し替えるので、ヘッダー・パンくず・フッターも一緒に広がり、
+  ロゴと本文の左端は揃ったままになる。
 */
-main.narrow > * {
-	max-width: var(--measure);
+body.wide {
+	--shell: 64rem;
 }
 
-/* パンくずが上にある場合は、その分だけ本文の上余白を詰める */
+/*
+  カードの張り出し量。body に長さそのもので持たせ、子孫はこれを継承して使う。
+
+  100% を含む式（画面幅から逆算する形）にしてはいけない。カスタムプロパティは
+  式のまま継承され、使われた要素ごとに 100% の基準が変わる。記事ページの
+  目次カードでは 15rem の列幅が基準になり、main と違う値になっていた。
+
+  切り替え幅は「レール + 2.5rem × 2」。メディアクエリでは var() が使えないので、
+  レール幅（44rem / 64rem）ごとに値を持っている。
+*/
+body {
+	--card-pad: 1.25rem;
+}
+@media (min-width: 49rem) {
+	body:not(.wide) {
+		--card-pad: 2.5rem;
+	}
+}
+@media (min-width: 69rem) {
+	body.wide {
+		--card-pad: 2.5rem;
+	}
+}
+
+/*
+  カードが画面端まで届く幅では角丸を外す。
+  届くのは「レール + レールの外側の余白 1.25rem × 2」を下回ったとき。
+*/
+@media (max-width: 46.5rem) {
+	main {
+		border-radius: 0;
+	}
+}
+@media (max-width: 66.5rem) {
+	body.wide main {
+		border-radius: 0;
+	}
+}
+
+/*
+  パンくずが上にある場合は、パンくずとカードの間を詰める。
+  パンくずは地の上に置くので、カードの内側の上余白は詰めない。
+*/
 .crumbs + main {
-	padding-top: 1.6rem;
+	margin-top: 1rem;
+	padding-top: 2.5rem;
 }
 
 /* 見出し。和文は 1.2 だと行が重なって見えるので 1.5 前後を確保する */
@@ -255,8 +316,10 @@ input {
 		font-size: 16px;
 		line-height: 1.85;
 	}
+	/* 左右の余白は --card-pad が持つので、ここでは上下だけ上書きする */
 	main {
-		padding: 2.5rem 0 3.5rem;
+		padding-top: 2.5rem;
+		padding-bottom: 3.5rem;
 	}
 	h1 {
 		font-size: 1.7rem;

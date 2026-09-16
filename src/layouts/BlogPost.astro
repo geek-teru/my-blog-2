@@ -30,7 +30,7 @@ const hasToc = (headings ?? []).filter((h) => h.depth === 2 || h.depth === 3).le
 	<head>
 		<BaseHead title={title} description={description} type="article" image={heroImage} />
 	</head>
-	<body>
+	<body class:list={[{ wide: hasToc }]}>
 		<Header />
 		<Breadcrumbs current={title} />
 		<main class:list={['post', hasToc ? 'with-side' : 'narrow']}>
@@ -91,15 +91,62 @@ const hasToc = (headings ?? []).filter((h) => h.depth === 2 || h.depth === 3).le
 
 <style>
 	/*
-	  目次があるときだけ「左に目次 / 右に本文」の2カラムにする。
+	  目次があるときだけ「左に本文 / 右に目次」の2カラムにする。
 	  align-items: start を付けないと sticky が効かない（グリッド項目が
 	  行いっぱいに引き伸ばされ、動く余地が無くなるため）。
+
+	  目次と本文は別々の白いカードにする。main 自体のカード（global.css）は
+	  背景を消して、並べるための枠としてだけ使う。
 	*/
 	.post.with-side {
+		/* カード同士の間に見せる地の幅 */
+		--card-gap: 1.5rem;
+
 		display: grid;
-		grid-template-columns: 15rem minmax(0, 1fr);
-		gap: 3.5rem;
+		grid-template-columns: minmax(0, 1fr) 15rem;
+		/*
+		  各カードは内側の余白（--card-pad）ぶん外へ張り出すので、列の間隔は
+		  「両側の張り出し + 見せたい隙間」にする。これより狭いとカードが重なる。
+		*/
+		gap: calc(var(--card-pad) * 2 + var(--card-gap));
 		align-items: start;
+		padding-top: 0;
+		padding-bottom: 0;
+		border-radius: 0;
+		background: none;
+	}
+	/*
+	  カードの張り出し方は main のカードと同じ考え方。レールの外側（左端・右端）と
+	  カード同士の間に向けて --card-pad ぶん広げ、中の文字の左端は
+	  ヘッダーのロゴやパンくずと揃えたままにする。
+	*/
+	.with-side > .side,
+	.with-side > .content {
+		padding: 1.5rem var(--card-pad);
+		border-radius: var(--radius);
+		background: var(--bg);
+	}
+	.with-side > .side {
+		margin-left: calc(var(--card-pad) * -1);
+		margin-right: calc(var(--card-pad) * -1);
+	}
+	.with-side > .content {
+		margin-left: calc(var(--card-pad) * -1);
+		margin-right: calc(var(--card-pad) * -1);
+		padding-top: 2.5rem;
+		padding-bottom: 3.5rem;
+	}
+	/*
+	  マークアップは目次が先のまま、見た目だけ右の列に置く。
+	  狭い画面で縦積みにしたときは、この順で目次が本文の上に来る。
+	*/
+	.with-side > .side {
+		grid-column: 2;
+		grid-row: 1;
+	}
+	.with-side > .content {
+		grid-column: 1;
+		grid-row: 1;
 	}
 	.side {
 		position: sticky;
@@ -155,7 +202,16 @@ const hasToc = (headings ?? []).filter((h) => h.depth === 2 || h.depth === 3).le
 		text-decoration: underline;
 	}
 
-	/* 横に並べる余裕が無くなったら、目次を本文の上に戻す */
+	/*
+	  横に並べる余裕が無くなったら、目次のカードを本文のカードの上に積む。
+	  この幅ではカードが画面端まで届くので、角丸も外す。
+	*/
+	@media (max-width: 66.5rem) {
+		.with-side > .side,
+		.with-side > .content {
+			border-radius: 0;
+		}
+	}
 	@media (max-width: 60rem) {
 		.post.with-side {
 			display: block;
@@ -163,7 +219,9 @@ const hasToc = (headings ?? []).filter((h) => h.depth === 2 || h.depth === 3).le
 		.side {
 			position: static;
 			max-height: none;
-			margin-bottom: 2.5rem;
+		}
+		.with-side > .side {
+			margin-bottom: var(--card-gap);
 		}
 	}
 </style>
