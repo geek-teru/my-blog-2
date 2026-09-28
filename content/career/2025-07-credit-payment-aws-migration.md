@@ -1,5 +1,5 @@
 ---
-title: クレジットカード決済システムの AWS 移行
+title: 総合エンタメプラットフォームのクレカ決済システムのクラウド移行
 branch: freelance
 from: '2025.07'
 summary:
